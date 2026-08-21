@@ -15,8 +15,9 @@ namespace Proyecto_Inmobiliaria.Models
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 string sql = @"INSERT INTO propietario 
-					(dni, nombre, apellido, telefono, email,)
-					VALUES (@dni, @nombre, @apellido, @telefono, @email)";
+					(dni, nombre, apellido, telefono, email)
+					VALUES (@dni, @nombre, @apellido, @telefono, @email)
+                    SELECT LAST_INSERT_ID()";
 
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
@@ -68,15 +69,15 @@ namespace Proyecto_Inmobiliaria.Models
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
                     command.CommandType = CommandType.Text;
-					command.Parameters.AddWithValue("@dni", p.Dni);
-					command.Parameters.AddWithValue("@nombre", p.Nombre);
-					command.Parameters.AddWithValue("@apellido", p.Apellido);
-					command.Parameters.AddWithValue("@telefono", p.Telefono);
-					command.Parameters.AddWithValue("@email", p.Email);
-					command.Parameters.AddWithValue("@id", p.IdPropietario);
-					connection.Open();
-					res = command.ExecuteNonQuery();
-					connection.Close();
+                    command.Parameters.AddWithValue("@dni", p.Dni);
+                    command.Parameters.AddWithValue("@nombre", p.Nombre);
+                    command.Parameters.AddWithValue("@apellido", p.Apellido);
+                    command.Parameters.AddWithValue("@telefono", p.Telefono);
+                    command.Parameters.AddWithValue("@email", p.Email);
+                    command.Parameters.AddWithValue("@id", p.IdPropietario);
+                    connection.Open();
+                    res = command.ExecuteNonQuery();
+                    connection.Close();
                 }
 
             }
@@ -117,46 +118,46 @@ namespace Proyecto_Inmobiliaria.Models
             return p;
         }
 
-        
+
         public IList<Propietario> ObtenerTodos()
-{
-    IList<Propietario> propietarios = new List<Propietario>();
+        {
+            IList<Propietario> propietarios = new List<Propietario>();
 
 
-    string sql = @"SELECT id, dni, nombre, apellido, telefono, email 
+            string sql = @"SELECT id, dni, nombre, apellido, telefono, email 
                    FROM propietario;";
 
 
-    using (SqlConnection connection = new SqlConnection(connectionString))
-    {
-        using (SqlCommand command = new SqlCommand(sql, connection))
-        {
-
-            connection.Open();
-
-
-            using (SqlDataReader reader = command.ExecuteReader())
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
-
-                while (reader.Read())
+                using (SqlCommand command = new SqlCommand(sql, connection))
                 {
 
-                    Propietario p = new Propietario
-                    {
-                        IdPropietario = reader.GetInt32("id"), 
-                        Dni = reader.GetString("dni"),
-                        Nombre = reader.GetString("nombre"),
-                        Apellido = reader.GetString("apellido"),
-                        Telefono = reader.GetString("telefono"),
-                        Email = reader.GetString("email")
-                    };
-                    propietarios.Add(p);
-                }
-            } 
-        } 
-    } 
+                    connection.Open();
 
-    return propietarios; 
-}
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+
+                        while (reader.Read())
+                        {
+
+                            Propietario p = new Propietario
+                            {
+                                IdPropietario = reader.GetInt32("id"),
+                                Dni = reader.GetString("dni"),
+                                Nombre = reader.GetString("nombre"),
+                                Apellido = reader.GetString("apellido"),
+                                Telefono = reader.GetString("telefono"),
+                                Email = reader.GetString("email")
+                            };
+                            propietarios.Add(p);
+                        }
+                    }
+                }
+            }
+
+            return propietarios;
+        }
     }
 }

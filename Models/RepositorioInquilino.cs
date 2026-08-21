@@ -15,8 +15,9 @@ namespace Proyecto_Inmobiliaria.Models
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 string sql = @"INSERT INTO inquilino 
-					(dni, nombre, apellido, telefono, email,)
-					VALUES (@dni, @nombre, @apellido, @telefono, @email)";
+					(dni, nombre, apellido, telefono, email)
+					VALUES (@dni, @nombre, @apellido, @telefono, @email)
+                    SELECT LAST_INSERT_ID()";
 
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
