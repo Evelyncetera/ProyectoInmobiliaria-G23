@@ -84,5 +84,79 @@ namespace Proyecto_Inmobiliaria.Models
             return res;
 
         }
+
+        public Propietario? ObtenerPorId(int id)
+        {
+            Propietario? p = null;
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                string sql = @"SELECT IdPropietario, dni, nombre, apellido, telefono, email 
+                    FROM propietario
+                    WHERE IdPropietario=@id";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.Add("@id", SqlDbType.Int).Value = id;
+                    command.CommandType = CommandType.Text;
+                    connection.Open();
+                    var reader = command.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        p = new Propietario
+                        {
+                            IdPropietario = reader.GetInt32(nameof(Propietario.IdPropietario)),
+                            Nombre = reader.GetString("Nombre"),
+                            Apellido = reader.GetString("Apellido"),
+                            Dni = reader.GetString("Dni"),
+                            Telefono = reader.GetString("Telefono"),
+                            Email = reader.GetString("Email"),
+                        };
+                    }
+                    connection.Close();
+                }
+            }
+            return p;
+        }
+
+        
+        public IList<Propietario> ObtenerTodos()
+{
+    IList<Propietario> propietarios = new List<Propietario>();
+
+
+    string sql = @"SELECT id, dni, nombre, apellido, telefono, email 
+                   FROM propietario;";
+
+
+    using (SqlConnection connection = new SqlConnection(connectionString))
+    {
+        using (SqlCommand command = new SqlCommand(sql, connection))
+        {
+
+            connection.Open();
+
+
+            using (SqlDataReader reader = command.ExecuteReader())
+            {
+
+                while (reader.Read())
+                {
+
+                    Propietario p = new Propietario
+                    {
+                        IdPropietario = reader.GetInt32("id"), 
+                        Dni = reader.GetString("dni"),
+                        Nombre = reader.GetString("nombre"),
+                        Apellido = reader.GetString("apellido"),
+                        Telefono = reader.GetString("telefono"),
+                        Email = reader.GetString("email")
+                    };
+                    propietarios.Add(p);
+                }
+            } 
+        } 
+    } 
+
+    return propietarios; 
+}
     }
 }

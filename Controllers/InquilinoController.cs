@@ -14,7 +14,7 @@ namespace Proyecto_Inmobiliaria.Controllers
 
         // GET: /Inquilinos
         [HttpGet]
-       /*  public IActionResult Index()
+        public IActionResult Index()
         {
             try
             {
@@ -26,7 +26,7 @@ namespace Proyecto_Inmobiliaria.Controllers
                 TempData["Error"] = "No se pudo recuperar la lista: " + ex.Message;
                 return View(new List<Inquilino>());
             }
-        } */
+        }
 
         // GET: /Inquilinos/Crear
         [HttpGet]
@@ -58,7 +58,7 @@ namespace Proyecto_Inmobiliaria.Controllers
             }
         }
 
-       /*  // GET: /Inquilinos/Editar/5
+        // GET: /Inquilinos/Editar/5
         [HttpGet]
         public IActionResult Editar(int id)
         {
@@ -77,7 +77,7 @@ namespace Proyecto_Inmobiliaria.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
- */
+
         // POST: /Inquilinos/Editar/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -106,7 +106,7 @@ namespace Proyecto_Inmobiliaria.Controllers
             }
         }
 
-       /*  // GET: /Inquilinos/Eliminar/5
+        // GET: /Inquilinos/Eliminar/5
         [HttpGet]
         public IActionResult Eliminar(int id)
         {
@@ -124,7 +124,7 @@ namespace Proyecto_Inmobiliaria.Controllers
                 TempData["Error"] = "Error al buscar inquilino: " + ex.Message;
                 return RedirectToAction(nameof(Index));
             }
-        } */
+        }
 
         // POST: /Inquilinos/Eliminar/5
         [HttpPost, ActionName("Eliminar")]

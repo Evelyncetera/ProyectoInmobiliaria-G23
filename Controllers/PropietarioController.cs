@@ -13,7 +13,7 @@ namespace Proyecto_Inmobiliaria.Controllers
             _repositorio = repositorio;
         }
 
-       /*  // GET: /Propietarios
+        // GET: /Propietarios
         [HttpGet]
         public IActionResult Index()
         {
@@ -28,7 +28,7 @@ namespace Proyecto_Inmobiliaria.Controllers
                 return View(new List<Propietario>());
             }
         }
- */
+
         // GET: /Propietarios/Crear
         [HttpGet]
         public IActionResult Crear()
@@ -59,7 +59,7 @@ namespace Proyecto_Inmobiliaria.Controllers
             }
         }
 
-       /*  // GET: /Propietarios/Editar/5
+        // GET: /Propietarios/Editar/5
         [HttpGet]
         public IActionResult Editar(int id)
         {
@@ -78,7 +78,7 @@ namespace Proyecto_Inmobiliaria.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
- */
+
         // POST: /Propietarios/Editar/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -107,7 +107,7 @@ namespace Proyecto_Inmobiliaria.Controllers
             }
         }
 
-       /*  // GET: /Propietarios/Eliminar/5
+        // GET: /Propietarios/Eliminar/5
         [HttpGet]
         public IActionResult Eliminar(int id)
         {
@@ -125,7 +125,7 @@ namespace Proyecto_Inmobiliaria.Controllers
                 TempData["Error"] = "Error al buscar propietario: " + ex.Message;
                 return RedirectToAction(nameof(Index));
             }
-        } */
+        }
 
         // POST: /Propietarios/Eliminar/5
         [HttpPost, ActionName("Eliminar")]

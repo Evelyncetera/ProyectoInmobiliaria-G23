@@ -82,5 +82,92 @@ namespace Proyecto_Inmobiliaria.Models
 
             return res;
         }
+
+
+        public IList<Inquilino> ObtenerTodos()
+        {
+            IList<Inquilino> inquilinos = new List<Inquilino>();
+
+
+            string sql = @"SELECT id, dni, nombre, apellido, telefono, email 
+                        FROM inquilino;";
+
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    connection.Open();
+
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+
+                        while (reader.Read())
+                        {
+
+                            Inquilino i = new Inquilino
+                            {
+
+                                IdInquilino = reader.GetInt32("id"), 
+                                Dni = reader.GetString("dni"),
+                                Nombre = reader.GetString("nombre"),
+                                Apellido = reader.GetString("apellido"),
+                                Telefono = reader.GetString("telefono"),
+                                Email = reader.GetString("email")
+                            };
+
+                            inquilinos.Add(i);
+                        }
+                    }
+                }
+            }
+
+            return inquilinos;
+        }
+
+
+        public Inquilino? ObtenerPorId(int id)
+        {
+            Inquilino? i = null;
+
+
+            string sql = @"SELECT id, dni, nombre, apellido, telefono, email 
+                            FROM inquilino 
+                            WHERE id = @id;";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+
+                    command.Parameters.AddWithValue("@id", id);
+
+                    connection.Open();
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+
+                        if (reader.Read())
+                        {
+
+                            i = new Inquilino
+                            {
+                                IdInquilino = reader.GetInt32("id"),
+                                Dni = reader.GetString("dni"),
+                                Nombre = reader.GetString("nombre"),
+                                Apellido = reader.GetString("apellido"),
+                                Telefono = reader.GetString("telefono"),
+                                Email = reader.GetString("email")
+                            };
+                        }
+                    }
+                }
+            }
+
+            return i;
+        }
+
+
     }
 }
