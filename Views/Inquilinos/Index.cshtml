@@ -37,10 +37,13 @@
                                             <a asp-action="Editar" asp-route-id="@item.IdInquilino" class="btn btn-warning btn-sm">
                                                 <i class="bi bi-pencil-fill"></i> Editar
                                             </a>
-                                            <!-- Envía el Id al método Eliminar del controlador -->
-                                            <a asp-action="Eliminar" asp-route-id="@item.IdInquilino" class="btn btn-danger btn-sm">
-                                                <i class="bi bi-trash-fill"></i> Eliminar
-                                            </a>
+                                            <!-- Baja directa: POST con confirmación previa -->
+                                            <form asp-action="Eliminar" asp-route-id="@item.IdInquilino" method="post" class="d-inline"
+                                                  onsubmit="return confirm('¿Eliminar a @item.Nombre @item.Apellido? Esta acción no se puede deshacer.');">
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    <i class="bi bi-trash-fill"></i> Eliminar
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>

@@ -1,4 +1,4 @@
-using Microsoft.Data.SqlClient;
+﻿using MySqlConnector;
 using System.Data;
 
 namespace Proyecto_Inmobiliaria.Models
@@ -12,14 +12,13 @@ namespace Proyecto_Inmobiliaria.Models
         public int Alta(Inquilino i)
         {
             int res = -1;
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
                 string sql = @"INSERT INTO inquilino 
 					(dni, nombre, apellido, telefono, email)
-					VALUES (@dni, @nombre, @apellido, @telefono, @email)
-                    SELECT LAST_INSERT_ID()";
+					VALUES (@dni, @nombre, @apellido, @telefono, @email)";
 
-                using (SqlCommand command = new SqlCommand(sql, connection))
+                using (MySqlCommand command = new MySqlCommand(sql, connection))
                 {
                     command.CommandType = CommandType.Text;
                     command.Parameters.AddWithValue("@dni", i.Dni);
@@ -28,7 +27,8 @@ namespace Proyecto_Inmobiliaria.Models
                     command.Parameters.AddWithValue("@telefono", i.Telefono);
                     command.Parameters.AddWithValue("@email", i.Email);
                     connection.Open();
-                    res = Convert.ToInt32(command.ExecuteScalar());
+                    command.ExecuteNonQuery();
+                    res = (int)command.LastInsertedId;
                     i.IdInquilino = res;
                     connection.Close();
                 }
@@ -39,11 +39,11 @@ namespace Proyecto_Inmobiliaria.Models
         public int Baja(int id)
         {
             int res = -1;
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                string sql = @"DELETE FROM inquilino WHERE IdInquilino = @id";
+                string sql = @"DELETE FROM inquilino WHERE id = @id";
 
-                using (SqlCommand command = new SqlCommand(sql, connection))
+                using (MySqlCommand command = new MySqlCommand(sql, connection))
                 {
                     command.CommandType = CommandType.Text;
                     command.Parameters.AddWithValue("@id", id);
@@ -59,13 +59,13 @@ namespace Proyecto_Inmobiliaria.Models
         public int Modificacion(Inquilino i)
         {
             int res = -1;
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
                 string sql = @"UPDATE inquilino 
-					SET Dni=@dni, Nombre=@nombre, Apellido=@apellido, Telefono=@telefono, Email=@email 
-                    WHERE IdInquilino = @id";
+					SET dni=@dni, nombre=@nombre, apellido=@apellido, telefono=@telefono, email=@email 
+                    WHERE id = @id";
 
-                using (SqlCommand command = new SqlCommand(sql, connection))
+                using (MySqlCommand command = new MySqlCommand(sql, connection))
                 {
                     command.CommandType = CommandType.Text;
                     command.Parameters.AddWithValue("@dni", i.Dni);
@@ -94,14 +94,14 @@ namespace Proyecto_Inmobiliaria.Models
                         FROM inquilino;";
 
 
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                using (SqlCommand command = new SqlCommand(sql, connection))
+                using (MySqlCommand command = new MySqlCommand(sql, connection))
                 {
                     connection.Open();
 
 
-                    using (SqlDataReader reader = command.ExecuteReader())
+                    using (MySqlDataReader reader = command.ExecuteReader())
                     {
 
                         while (reader.Read())
@@ -137,16 +137,16 @@ namespace Proyecto_Inmobiliaria.Models
                             FROM inquilino 
                             WHERE id = @id;";
 
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                using (SqlCommand command = new SqlCommand(sql, connection))
+                using (MySqlCommand command = new MySqlCommand(sql, connection))
                 {
 
                     command.Parameters.AddWithValue("@id", id);
 
                     connection.Open();
 
-                    using (SqlDataReader reader = command.ExecuteReader())
+                    using (MySqlDataReader reader = command.ExecuteReader())
                     {
 
                         if (reader.Read())

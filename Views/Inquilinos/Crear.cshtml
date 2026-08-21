@@ -9,6 +9,12 @@
             <form asp-action="Crear" method="post">
                 <!-- Mensaje de resumen para validaciones generales -->
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill"></i> @ViewBag.Error
+                    </div>
+                }
 
                 <div class="row">
                     <!-- Documento (DNI) -->

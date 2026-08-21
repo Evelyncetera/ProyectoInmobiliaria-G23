@@ -27,7 +27,11 @@
             <td>
                 <!-- Los tag helpers "asp-route-id" pasan el ID del propietario al controlador -->
                 <a asp-action="Editar" asp-route-id="@p.IdPropietario" class="btn btn-warning btn-sm">Editar</a>
-                <a asp-action="Eliminar" asp-route-id="@p.IdPropietario" class="btn btn-danger btn-sm">Eliminar</a>
+                <!-- Baja directa: POST con confirmación previa -->
+                <form asp-action="Eliminar" asp-route-id="@p.IdPropietario" method="post" class="d-inline"
+                      onsubmit="return confirm('¿Eliminar a @p.Nombre @p.Apellido? Esta acción no se puede deshacer.');">
+                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                </form>
             </td>
         </tr>
     }

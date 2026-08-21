@@ -8,6 +8,12 @@
         <div class="card-body">
             <form asp-action="Editar" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill"></i> @ViewBag.Error
+                    </div>
+                }
 
                 <!-- Campo oculto MUY IMPORTANTE para identificar el registro al guardar -->
                 <input type="hidden" asp-for="IdInquilino" />
