@@ -1,0 +1,39 @@
+@model Propietario
+
+<h1>Registrar Propietario</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Crear" method="post">
+            <div class="form-group mb-3">
+                <label asp-for="Dni" class="control-label">Documento (DNI)</label>
+                <input asp-for="Dni" class="form-control" required />
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Nombre" class="control-label">Nombre</label>
+                <input asp-for="Nombre" class="form-control" required />
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Apellido" class="control-label">Apellido</label>
+                <input asp-for="Apellido" class="form-control" required />
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Email" class="control-label">Correo Electrónico</label>
+                <input asp-for="Email" type="email" class="form-control" required />
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Telefono" class="control-label">Teléfono de Contacto</label>
+                <input asp-for="Telefono" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-success">Guardar</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>

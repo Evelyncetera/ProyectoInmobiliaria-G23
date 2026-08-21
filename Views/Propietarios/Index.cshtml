@@ -1,0 +1,35 @@
+@model IEnumerable<Propietario>
+
+<h1>Listado de Propietarios</h1>
+
+<p>
+    <!-- Botón para ir al formulario de alta -->
+    <a asp-action="Crear" class="btn btn-primary">Registrar Nuevo Propietario</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>DNI</th>
+            <th>Nombre Completo</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var p in Model) {
+        <tr>
+            <td>@p.Dni</td>
+            <td>@p.Nombre @p.Apellido</td>
+            <td>@p.Email</td>
+            <td>@p.Telefono</td>
+            <td>
+                <!-- Los tag helpers "asp-route-id" pasan el ID del propietario al controlador -->
+                <a asp-action="Editar" asp-route-id="@p.IdPropietario" class="btn btn-warning btn-sm">Editar</a>
+                <a asp-action="Eliminar" asp-route-id="@p.IdPropietario" class="btn btn-danger btn-sm">Eliminar</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

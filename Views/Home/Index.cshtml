@@ -1,8 +1,60 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Página de Inicio";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="text-center my-5">
+    <h1 class="display-4 fw-bold text-primary">Inmobiliaria - Sistema de Gestión</h1>
+    <p class="lead text-muted">Bienvenido al panel de administración de alquileres temporales.</p>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center g-4">
+        
+        <!-- Tarjeta para Propietarios -->
+        <div class="col-md-5">
+            <div class="card h-100 shadow-sm border-primary">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="display-3 text-primary mb-3">
+                            <i class="bi bi-person-badge"></i>
+                        </div>
+                        <h3 class="card-title fw-bold">Propietarios</h3>
+                        <p class="card-text text-muted">
+                            Administra los dueños de los inmuebles. Registra nuevos propietarios, actualiza sus datos de contacto o dalos de baja del sistema.
+                        </p>
+                    </div>
+                    <div class="mt-4">
+                        <!-- Redirige a PropietariosController -> Index() -->
+                        <a asp-controller="Propietarios" asp-action="Index" class="btn btn-primary w-100 py-2">
+                            Gestionar Propietarios
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta para Inquilinos -->
+        <div class="col-md-5">
+            <div class="card h-100 shadow-sm border-success">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="display-3 text-success mb-3">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <h3 class="card-title fw-bold">Inquilinos</h3>
+                        <p class="card-text text-muted">
+                            Administra los clientes que buscan alquilar. Registra sus datos personales en sus entrevistas y gestiona sus perfiles.
+                        </p>
+                    </div>
+                    <div class="mt-4">
+                        <!-- Redirige a InquilinosController -> Index() -->
+                        <a asp-controller="Inquilinos" asp-action="Index" class="btn btn-success w-100 py-2">
+                            Gestionar Inquilinos
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </div>
