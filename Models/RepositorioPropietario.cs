@@ -125,7 +125,7 @@ namespace Proyecto_Inmobiliaria.Models
 
 
             string sql = @"SELECT id, dni, nombre, apellido, telefono, email 
-                   FROM propietario;";
+                        FROM propietario;";
 
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
