@@ -26,6 +26,7 @@
             <td>@p.Telefono</td>
             <td>
                 <!-- Los tag helpers "asp-route-id" pasan el ID del propietario al controlador -->
+                <a asp-action="Detalles" asp-route-id="@p.IdPropietario" class="btn btn-info btn-sm text-white">Detalles</a>
                 <a asp-action="Editar" asp-route-id="@p.IdPropietario" class="btn btn-warning btn-sm">Editar</a>
                 <!-- Baja directa: POST con confirmación previa -->
                 <form asp-action="Eliminar" asp-route-id="@p.IdPropietario" method="post" class="d-inline"

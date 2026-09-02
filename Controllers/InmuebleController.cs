@@ -106,6 +106,28 @@ namespace Proyecto_Inmobiliaria.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult Detalles(int id)
+        {
+            try
+            {
+                var inmueble = _repositorio.ObtenerPorId(id);
+                return inmueble == null ? NotFound() : View(inmueble);
+            }
+            catch (MySqlException ex)
+            {
+                _logger.LogError(ex, "Error de base de datos al buscar el inmueble {IdInmueble}", id);
+                TempData["Error"] = "Ocurrió un error de conexión a la base de datos";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error inesperado al buscar el inmueble {IdInmueble}", id);
+                TempData["Error"] = "Error al buscar inmueble";
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
         // POST: /Inmuebles/Editar/5
         [HttpPost]
         [ValidateAntiForgeryToken]

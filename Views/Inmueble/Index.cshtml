@@ -1,0 +1,55 @@
+@model IEnumerable<Inmueble>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-primary fw-bold">Listado de Inmuebles</h1>
+        <a asp-action="Crear" class="btn btn-primary"><i class="bi bi-house-add-fill"></i> Registrar Nuevo Inmueble</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0 align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Dirección</th>
+                            <th>Propietario</th>
+                            <th>Cupo</th>
+                            <th>Precio por día</th>
+                            <th>Estado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var inmueble in Model)
+                        {
+                            <tr>
+                                <td class="fw-bold">@inmueble.Direccion</td>
+                                <td>ID @inmueble.IdPropietario</td>
+                                <td>@inmueble.Cupo</td>
+                                <td>@inmueble.PrecioPorDia.ToString("C")</td>
+                                <td><span class="badge @(inmueble.Disponible ? "bg-success" : "bg-secondary")">@(inmueble.Disponible ? "Disponible" : "No disponible")</span></td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Detalles" asp-route-id="@inmueble.IdInmueble" class="btn btn-info btn-sm text-white"><i class="bi bi-eye-fill"></i> Detalles</a>
+                                        <a asp-action="Editar" asp-route-id="@inmueble.IdInmueble" class="btn btn-warning btn-sm"><i class="bi bi-pencil-fill"></i> Editar</a>
+                                        <form asp-action="Eliminar" asp-route-id="@inmueble.IdInmueble" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar este inmueble? Esta acción no se puede deshacer.');">
+                                            <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash-fill"></i> Eliminar</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="6" class="text-center py-4 text-muted"><i class="bi bi-info-circle display-6 d-block mb-2 text-secondary"></i>No hay inmuebles registrados en el sistema.</td></tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

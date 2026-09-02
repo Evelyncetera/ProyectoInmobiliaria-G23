@@ -1,0 +1,27 @@
+@model Propietario
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Detalles del Propietario</h2>
+        </div>
+        <div class="card-body">
+            <dl class="row mb-4">
+                <dt class="col-md-4">ID</dt>
+                <dd class="col-md-8">@Model.IdPropietario</dd>
+                <dt class="col-md-4">DNI / Documento</dt>
+                <dd class="col-md-8">@Model.Dni</dd>
+                <dt class="col-md-4">Nombre completo</dt>
+                <dd class="col-md-8">@Model.Nombre @Model.Apellido</dd>
+                <dt class="col-md-4">Teléfono</dt>
+                <dd class="col-md-8">@(string.IsNullOrEmpty(Model.Telefono) ? "No registrado" : Model.Telefono)</dd>
+                <dt class="col-md-4">Correo electrónico</dt>
+                <dd class="col-md-8">@Model.Email</dd>
+            </dl>
+            <div class="d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Volver</a>
+                <a asp-action="Editar" asp-route-id="@Model.IdPropietario" class="btn btn-warning text-dark"><i class="bi bi-pencil-fill"></i> Editar</a>
+            </div>
+        </div>
+    </div>
+</div>

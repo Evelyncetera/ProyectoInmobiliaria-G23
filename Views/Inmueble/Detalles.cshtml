@@ -1,0 +1,39 @@
+@model Inmueble
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Detalles del Inmueble</h2>
+        </div>
+        <div class="card-body">
+            <dl class="row mb-4">
+                <dt class="col-md-4">Código interno</dt>
+                <dd class="col-md-8">@Model.IdInmueble</dd>
+                <dt class="col-md-4">Dirección</dt>
+                <dd class="col-md-8">@Model.Direccion</dd>
+                <dt class="col-md-4">Propietario (ID)</dt>
+                <dd class="col-md-8">@Model.IdPropietario</dd>
+                <dt class="col-md-4">Tipo de inmueble (ID)</dt>
+                <dd class="col-md-8">@Model.IdTipoInmueble</dd>
+                <dt class="col-md-4">Cupo</dt>
+                <dd class="col-md-8">@Model.Cupo personas</dd>
+                <dt class="col-md-4">Precio por día</dt>
+                <dd class="col-md-8">@Model.PrecioPorDia.ToString("C")</dd>
+                <dt class="col-md-4">Porcentaje de reserva</dt>
+                <dd class="col-md-8">@Model.PorcentajeReserva%</dd>
+                <dt class="col-md-4">Ubicación</dt>
+                <dd class="col-md-8">Latitud: @Model.Latitud, Longitud: @Model.Longitud</dd>
+                <dt class="col-md-4">Disponibilidad</dt>
+                <dd class="col-md-8">
+                    <span class="badge @(Model.Disponible ? "bg-success" : "bg-secondary")">
+                        @(Model.Disponible ? "Disponible" : "No disponible")
+                    </span>
+                </dd>
+            </dl>
+            <div class="d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Volver</a>
+                <a asp-action="Editar" asp-route-id="@Model.IdInmueble" class="btn btn-warning text-dark"><i class="bi bi-pencil-fill"></i> Editar</a>
+            </div>
+        </div>
+    </div>
+</div>
