@@ -57,6 +57,30 @@ CREATE TABLE IF NOT EXISTS `inmueble` (
               AND `porcentaje_reserva` <= 100)
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS `reserva` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `id_inquilino` INT NOT NULL,
+    `id_inmueble` INT NOT NULL,
+    `fecha_desde` DATE NOT NULL,
+    `fecha_hasta` DATE NOT NULL,
+    `monto_por_dia` DECIMAL(12,2) NOT NULL,
+    `anulada` BOOLEAN NOT NULL DEFAULT FALSE,
+
+    CONSTRAINT `fk_reserva_inquilino`
+        FOREIGN KEY (`id_inquilino`)
+        REFERENCES `inquilino` (`id`),
+
+    CONSTRAINT `fk_reserva_inmueble`
+        FOREIGN KEY (`id_inmueble`)
+        REFERENCES `inmueble` (`id`),
+
+    CONSTRAINT `chk_reserva_fechas`
+        CHECK (`fecha_hasta` >= `fecha_desde`),
+
+    CONSTRAINT `chk_reserva_monto`
+        CHECK (`monto_por_dia` > 0)
+) ENGINE=InnoDB;
+
 /* ---- Seeders ---- */ 
 
 INSERT INTO `propietario` (`dni`, `nombre`, `apellido`, `telefono`, `email`) VALUES
@@ -132,4 +156,71 @@ WHERE p.dni = '22222222'
       WHERE i.id_propietario = p.id
         AND i.id_tipo_inmueble = t.id
         AND i.direccion = 'Rivadavia 920'
+  );
+
+/* ---- Seeders de Reservas (fechas relativas a la fecha actual) ---- */
+/* Reserva 1: vigente (hoy está dentro del rango) */
+INSERT INTO `reserva` (`id_inquilino`, `id_inmueble`, `fecha_desde`, `fecha_hasta`, `monto_por_dia`, `anulada`)
+SELECT i.id, inm.id, DATE_SUB(CURDATE(), INTERVAL 5 DAY), DATE_ADD(CURDATE(), INTERVAL 10 DAY), 85000.00, FALSE
+FROM inquilino i
+INNER JOIN inmueble inm ON inm.direccion = 'Av. España 1250'
+WHERE i.dni = '33333333'
+  AND NOT EXISTS (
+      SELECT 1 FROM reserva r
+      WHERE r.id_inquilino = i.id
+        AND r.id_inmueble = inm.id
+        AND r.fecha_desde = DATE_SUB(CURDATE(), INTERVAL 5 DAY)
+  );
+
+/* Reserva 2: histórica/vencida */
+INSERT INTO `reserva` (`id_inquilino`, `id_inmueble`, `fecha_desde`, `fecha_hasta`, `monto_por_dia`, `anulada`)
+SELECT i.id, inm.id, DATE_SUB(CURDATE(), INTERVAL 60 DAY), DATE_SUB(CURDATE(), INTERVAL 30 DAY), 65000.00, FALSE
+FROM inquilino i
+INNER JOIN inmueble inm ON inm.direccion = 'San Martín 450'
+WHERE i.dni = '44444444'
+  AND NOT EXISTS (
+      SELECT 1 FROM reserva r
+      WHERE r.id_inquilino = i.id
+        AND r.id_inmueble = inm.id
+        AND r.fecha_desde = DATE_SUB(CURDATE(), INTERVAL 60 DAY)
+  );
+
+/* Reserva 3: futura */
+INSERT INTO `reserva` (`id_inquilino`, `id_inmueble`, `fecha_desde`, `fecha_hasta`, `monto_por_dia`, `anulada`)
+SELECT i.id, inm.id, DATE_ADD(CURDATE(), INTERVAL 15 DAY), DATE_ADD(CURDATE(), INTERVAL 45 DAY), 68000.00, FALSE
+FROM inquilino i
+INNER JOIN inmueble inm ON inm.direccion = 'San Martín 450'
+WHERE i.dni = '33333333'
+  AND NOT EXISTS (
+      SELECT 1 FROM reserva r
+      WHERE r.id_inquilino = i.id
+        AND r.id_inmueble = inm.id
+        AND r.fecha_desde = DATE_ADD(CURDATE(), INTERVAL 15 DAY)
+  );
+
+/* Reserva 4: vigente */
+INSERT INTO `reserva` (`id_inquilino`, `id_inmueble`, `fecha_desde`, `fecha_hasta`, `monto_por_dia`, `anulada`)
+SELECT i.id, inm.id, DATE_SUB(CURDATE(), INTERVAL 2 DAY), DATE_ADD(CURDATE(), INTERVAL 20 DAY), 45000.00, FALSE
+FROM inquilino i
+INNER JOIN inmueble inm ON inm.direccion = 'Junín 780'
+WHERE i.dni = '44444444'
+  AND NOT EXISTS (
+      SELECT 1 FROM reserva r
+      WHERE r.id_inquilino = i.id
+        AND r.id_inmueble = inm.id
+        AND r.fecha_desde = DATE_SUB(CURDATE(), INTERVAL 2 DAY)
+  );
+
+/* Reserva 5: anulada (baja lógica). El inmueble queda 'sin reservas' para los reportes */
+INSERT INTO `reserva` (`id_inquilino`, `id_inmueble`, `fecha_desde`, `fecha_hasta`, `monto_por_dia`, `anulada`)
+SELECT i.id, inm.id, DATE_SUB(CURDATE(), INTERVAL 10 DAY), DATE_ADD(CURDATE(), INTERVAL 5 DAY), 55000.00, TRUE
+FROM inquilino i
+INNER JOIN inmueble inm ON inm.direccion = 'Rivadavia 920'
+WHERE i.dni = '33333333'
+  AND NOT EXISTS (
+      SELECT 1 FROM reserva r
+      WHERE r.id_inquilino = i.id
+        AND r.id_inmueble = inm.id
+        AND r.fecha_desde = DATE_SUB(CURDATE(), INTERVAL 10 DAY)
+        AND r.anulada = TRUE
   );
