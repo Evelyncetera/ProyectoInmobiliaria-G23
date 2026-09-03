@@ -10,7 +10,6 @@ namespace Proyecto_Inmobiliaria.Models
 
         }
 
-        // ----- ALTA -----
         public int Alta(Reserva r)
         {
             int res = -1;
@@ -70,7 +69,7 @@ namespace Proyecto_Inmobiliaria.Models
             return res;
         }
 
-        // ----- MODIFICACIÓN -----
+     
         public int Modificacion(Reserva r)
         {
             int res = -1;
@@ -142,7 +141,7 @@ namespace Proyecto_Inmobiliaria.Models
             return disponible;
         }
 
-        // ----- OBTENER TODOS -----
+      
         public IList<Reserva> ObtenerTodos()
         {
             IList<Reserva> reservas = new List<Reserva>();
@@ -173,7 +172,6 @@ namespace Proyecto_Inmobiliaria.Models
             return reservas;
         }
 
-        // ----- OBTENER POR ID -----
         public Reserva? ObtenerPorId(int id)
         {
             Reserva? r = null;
@@ -205,7 +203,7 @@ namespace Proyecto_Inmobiliaria.Models
             return r;
         }
 
-        // ----- RESERVAS VIGENTES (hoy dentro de [desde, hasta]) -----
+        // ----- RESERVAS VIGENTES (hoy dentro de un [desde, hasta]) -----
         public IList<Reserva> ObtenerVigentes()
         {
             IList<Reserva> reservas = new List<Reserva>();
@@ -409,7 +407,6 @@ namespace Proyecto_Inmobiliaria.Models
             return inmuebles;
         }
 
-        // ----- Helper: mapea una fila a Reserva (con datos enriquecidos) -----
         private static Reserva LeerReserva(MySqlDataReader reader)
         {
             return new Reserva

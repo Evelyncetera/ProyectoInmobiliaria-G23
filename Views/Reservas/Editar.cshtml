@@ -1,0 +1,76 @@
+@model Reserva
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-warning text-dark">
+            <h2 class="mb-0">Modificar Reserva</h2>
+        </div>
+        <div class="card-body">
+            <form asp-action="Editar" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill"></i> @ViewBag.Error
+                    </div>
+                }
+
+                
+                <input type="hidden" asp-for="IdReserva" />
+
+                <div class="row">
+                    <!-- Inquilino -->
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="IdInquilino" class="form-label font-weight-bold">Inquilino</label>
+                        <select asp-for="IdInquilino" class="form-select" asp-items="ViewBag.Inquilinos">
+                            <option value="">-- Seleccione un inquilino --</option>
+                        </select>
+                        <span asp-validation-for="IdInquilino" class="text-danger"></span>
+                    </div>
+
+                    <!-- Inmueble -->
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="IdInmueble" class="form-label font-weight-bold">Inmueble</label>
+                        <select asp-for="IdInmueble" class="form-select" asp-items="ViewBag.Inmuebles">
+                            <option value="">-- Seleccione un inmueble --</option>
+                        </select>
+                        <span asp-validation-for="IdInmueble" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Fecha desde -->
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="FechaDesde" class="form-label font-weight-bold">Fecha de inicio</label>
+                        <input asp-for="FechaDesde" type="date" class="form-control" />
+                        <span asp-validation-for="FechaDesde" class="text-danger"></span>
+                    </div>
+
+                    <!-- Fecha hasta -->
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="FechaHasta" class="form-label font-weight-bold">Fecha de finalización</label>
+                        <input asp-for="FechaHasta" type="date" class="form-control" />
+                        <span asp-validation-for="FechaHasta" class="text-danger"></span>
+                    </div>
+
+                    <!-- Monto por día -->
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="MontoPorDia" class="form-label font-weight-bold">Monto por día</label>
+                        <input asp-for="MontoPorDia" type="number" step="0.01" min="0.01" class="form-control" />
+                        <span asp-validation-for="MontoPorDia" class="text-danger"></span>
+                    </div>
+                </div>
+
+               
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-warning text-dark">
+                        Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,68 @@
+@model IEnumerable<Inmueble>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-primary fw-bold">Inmuebles disponibles entre fechas</h1>
+        <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Volver</a>
+    </div>
+
+    <!-- Formulario de fechas -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" asp-action="ReporteDisponibles" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="desde" class="form-label fw-bold">Fecha inicial</label>
+                    <input id="desde" name="desde" type="date" class="form-control" value="@ViewBag.Desde" required />
+                </div>
+                <div class="col-md-4">
+                    <label for="hasta" class="form-label fw-bold">Fecha final</label>
+                    <input id="hasta" name="hasta" type="date" class="form-control" value="@ViewBag.Hasta" required />
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Buscar disponibles</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0 align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Código</th>
+                            <th>Dirección</th>
+                            <th>Cupo</th>
+                            <th>Precio por día</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var inmueble in Model)
+                        {
+                            <tr>
+                                <td class="fw-bold">@inmueble.IdInmueble</td>
+                                <td>@inmueble.Direccion</td>
+                                <td>@inmueble.Cupo</td>
+                                <td>@inmueble.PrecioPorDia.ToString("C")</td>
+                                <td><span class="badge @(inmueble.Disponible ? "bg-success" : "bg-secondary")">@(inmueble.Disponible ? "Disponible" : "No disponible")</span></td>
+                            </tr>
+                        }
+                    }
+                    else if (ViewBag.Desde != null)
+                    {
+                        <tr><td colspan="5" class="text-center py-4 text-muted"><i class="bi bi-info-circle display-6 d-block mb-2 text-secondary"></i>No hay inmuebles libres entre @ViewBag.Desde y @ViewBag.Hasta.</td></tr>
+                    }
+                    else
+                    {
+                        <tr><td colspan="5" class="text-center py-4 text-muted"><i class="bi bi-info-circle display-6 d-block mb-2 text-secondary"></i>Ingrese las fechas para ver los inmuebles disponibles.</td></tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

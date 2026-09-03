@@ -1,0 +1,52 @@
+@model Reserva
+
+@{
+    var vigente = !Model.Anulada && Model.FechaDesde <= DateTime.Today && Model.FechaHasta >= DateTime.Today;
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-danger text-white">
+            <h2 class="mb-0">Anular Reserva</h2>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-danger" role="alert">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <strong>¿Confirma que desea anular esta reserva?</strong> La reserva quedará registrada como anulada y dejará de considerarse para disponibilidad y reportes. Esta acción no se puede deshacer.
+            </div>
+
+            <dl class="row mb-4">
+                <dt class="col-md-4">Código interno</dt>
+                <dd class="col-md-8">@Model.IdReserva</dd>
+                <dt class="col-md-4">Inquilino</dt>
+                <dd class="col-md-8">@Model.NombreInquilino @Model.ApellidoInquilino (@Model.DniInquilino)</dd>
+                <dt class="col-md-4">Inmueble</dt>
+                <dd class="col-md-8">@Model.DireccionInmueble</dd>
+                <dt class="col-md-4">Período</dt>
+                <dd class="col-md-8">@Model.FechaDesde.ToString("dd/MM/yyyy") a @Model.FechaHasta.ToString("dd/MM/yyyy")</dd>
+                <dt class="col-md-4">Estado</dt>
+                <dd class="col-md-8">
+                    @if (Model.Anulada)
+                    {
+                        <span class="badge bg-secondary"><i class="bi bi-x-circle-fill"></i> Anulada</span>
+                    }
+                    else if (vigente)
+                    {
+                        <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Vigente</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-info text-dark"><i class="bi bi-calendar-event-fill"></i> Programada/Vencida</span>
+                    }
+                </dd>
+            </dl>
+
+            <form asp-action="Eliminar" asp-route-id="@Model.IdReserva" method="post">
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Cancelar</a>
+                    <button type="submit" class="btn btn-danger"><i class="bi bi-trash-fill"></i> Confirmar Anulación</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

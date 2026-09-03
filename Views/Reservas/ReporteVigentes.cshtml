@@ -1,0 +1,47 @@
+@model IEnumerable<Reserva>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-primary fw-bold">Reservas vigentes</h1>
+        <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Volver</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0 align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Código</th>
+                            <th>Inquilino</th>
+                            <th>Inmueble</th>
+                            <th>Desde</th>
+                            <th>Hasta</th>
+                            <th>Monto por día</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var reserva in Model)
+                        {
+                            <tr>
+                                <td class="fw-bold">@reserva.IdReserva</td>
+                                <td>@reserva.NombreInquilino @reserva.ApellidoInquilino</td>
+                                <td>@reserva.DireccionInmueble</td>
+                                <td>@reserva.FechaDesde.ToString("dd/MM/yyyy")</td>
+                                <td>@reserva.FechaHasta.ToString("dd/MM/yyyy")</td>
+                                <td>@reserva.MontoPorDia.ToString("C")</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="6" class="text-center py-4 text-muted"><i class="bi bi-info-circle display-6 d-block mb-2 text-secondary"></i>No hay reservas vigentes en este momento.</td></tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
