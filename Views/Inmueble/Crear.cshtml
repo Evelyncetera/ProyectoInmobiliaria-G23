@@ -1,0 +1,99 @@
+@model Inmueble
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Registrar Inmueble</h2>
+        </div>
+        <div class="card-body">
+            <form asp-action="Crear" method="post">
+                <!-- Mensaje de resumen para validaciones generales -->
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill"></i> @ViewBag.Error
+                    </div>
+                }
+
+                <div class="row">
+                    <!-- Propietario -->
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="IdPropietario" class="form-label font-weight-bold">Propietario</label>
+                        <select asp-for="IdPropietario" class="form-select" asp-items="ViewBag.Propietarios">
+                            <option value="">-- Seleccione un propietario --</option>
+                        </select>
+                        <span asp-validation-for="IdPropietario" class="text-danger"></span>
+                    </div>
+
+                    <!-- Tipos de inmueble -->
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="IdTipoInmueble" class="form-label font-weight-bold">Inmueble</label>
+                        <select asp-for="IdTipoInmueble" class="form-select" asp-items="ViewBag.TiposInmuebles">
+                            <option value="">-- Seleccione un tipo de inmueble --</option>
+                        </select>
+                        <span asp-validation-for="IdTipoInmueble" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Dirección -->
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Direccion" class="form-label font-weight-bold">Ingrese la dirección</label>
+                        <input asp-for="Direccion" class="form-control" required />
+                        <span asp-validation-for="Direccion" class="text-danger"></span>
+                    </div>
+
+                    <!-- Cupo -->
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Cupo" class="form-label font-weight-bold">Cupo</label>
+                        <input asp-for="Cupo" class="form-control" required />
+                        <span asp-validation-for="Cupo" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Latitud -->
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Latitud" class="form-label font-weight-bold">Latitud</label>
+                        <input asp-for="Latitud" type="number" class="form-control" required />
+                        <span asp-validation-for="Latitud" class="text-danger"></span>
+                    </div>
+
+                    <!-- Longitud -->
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Longitud" class="form-label font-weight-bold">Longitud</label>
+                        <input asp-for="Longitud" type="number" class="form-control" required />
+                        <span asp-validation-for="Longitud" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Precio por dia -->
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="PrecioPorDia" class="form-label font-weight-bold">Precio por dia</label>
+                        <input asp-for="PrecioPorDia" type="number" class="form-control" required />
+                        <span asp-validation-for="PrecioPorDia" class="text-danger"></span>
+                    </div>
+
+                    <!-- Porcentaje de reserva -->
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="PorcentajeReserva" class="form-label font-weight-bold">Porcentaje de reserva</label>
+                        <input asp-for="PorcentajeReserva" type="number" class="form-control" required />
+                        <span asp-validation-for="PorcentajeReserva" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver al Listado
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-save"></i> Registrar Inmueble
+                    </button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>

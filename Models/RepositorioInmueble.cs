@@ -105,7 +105,7 @@ namespace Proyecto_Inmobiliaria.Models
                     cmd.Parameters.AddWithValue("@precio_por_dia", i.PrecioPorDia);
                     cmd.Parameters.AddWithValue("@porcentaje_reserva", i.PorcentajeReserva);
                     cmd.Parameters.AddWithValue("@disponible", i.Disponible);
-
+                    cmd.Parameters.AddWithValue("@id", i.IdInmueble);
                     connection.Open();
                     res = cmd.ExecuteNonQuery();
                     connection.Close();

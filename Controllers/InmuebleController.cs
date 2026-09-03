@@ -1,20 +1,42 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using MySqlConnector;
-using Proyecto_Inmobiliaria.Models;          
+using Proyecto_Inmobiliaria.Models;
 
 namespace Proyecto_Inmobiliaria.Controllers
 {
     public class InmuebleController : Controller
     {
         private readonly IRepositorioInmueble _repositorio;
+        private readonly IRepositorioPropietario _repositorioPropietario;
+        private readonly IRepositorioTipoInmueble _repositorioTipoInmueble;
 
         private readonly ILogger<InmuebleController> _logger;
 
         // El framework inyecta automáticamente el repositorio configurado
-        public InmuebleController(IRepositorioInmueble repositorio, ILogger<InmuebleController> logger)
+        public InmuebleController(IRepositorioInmueble repositorio,
+                                  IRepositorioPropietario repositorioPropietario,
+                                  IRepositorioTipoInmueble repositorioTipoInmueble,
+                                  ILogger<InmuebleController> logger)
         {
             _repositorio = repositorio;
+            _repositorioPropietario = repositorioPropietario;
+            _repositorioTipoInmueble = repositorioTipoInmueble;
             _logger = logger;
+        }
+
+        private void CargarSelectLists()
+        {
+            var propietarios = _repositorioPropietario.ObtenerTodos();
+            ViewBag.Propietarios = new SelectList(
+                propietarios.Select(p => new { p.IdPropietario, Texto = $"{p.Nombre} {p.Apellido} ({p.Dni})" }),
+                "IdPropietario", "Texto");
+
+            var tiposInmuebles = _repositorioTipoInmueble.ObtenerTodos();
+            ViewBag.TiposInmuebles = new SelectList(
+                tiposInmuebles.Select(ti => new { ti.IdTipoInmueble, Texto = $"{ti.Nombre}"}),
+                "IdTipoInmueble", "Texto");
+            
         }
 
         // GET: /Inmuebles
@@ -32,7 +54,7 @@ namespace Proyecto_Inmobiliaria.Controllers
                 TempData["Error"] = "Ocurrió un error de conexión a la base de datos";
                 return View(new List<Inmueble>());
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Error inesperado al recuperar los inmuebles");
                 TempData["Error"] = "No se pudo recuperar la lista";
@@ -44,7 +66,8 @@ namespace Proyecto_Inmobiliaria.Controllers
         [HttpGet]
         public IActionResult Crear()
         {
-            return View();
+            CargarSelectLists();
+            return View(new Inmueble());
         }
 
         // POST: /Inmuebles/Crear
@@ -71,7 +94,7 @@ namespace Proyecto_Inmobiliaria.Controllers
                     : "Ocurrió un error de conexión a la base de datos";
                 return View(inmueble);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Error inesperado al guardar el inmueble");
                 ViewBag.Error = "Ocurrió un error al guardar";
@@ -86,10 +109,11 @@ namespace Proyecto_Inmobiliaria.Controllers
             try
             {
                 var inmueble = _repositorio.ObtenerPorId(id);
-                if(inmueble == null)
+                if (inmueble == null)
                 {
                     return NotFound();
                 }
+                CargarSelectLists();
                 return View(inmueble);
             }
             catch (MySqlException ex)
@@ -140,11 +164,13 @@ namespace Proyecto_Inmobiliaria.Controllers
 
             if (!ModelState.IsValid)
             {
+                CargarSelectLists();
                 return View(inmueble);
             }
 
             try
             {
+                CargarSelectLists();
                 _repositorio.Modificacion(inmueble);
                 TempData["Mensaje"] = "Inmueble modificado con éxito.";
                 return RedirectToAction(nameof(Index));
