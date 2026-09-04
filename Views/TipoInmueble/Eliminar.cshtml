@@ -1,0 +1,18 @@
+@model TipoInmueble
+
+<div class="container mt-4">
+    <div class="card shadow-sm border-danger">
+        <div class="card-header bg-danger text-white">
+            <h2 class="mb-0">Eliminar Tipo de Inmueble</h2>
+        </div>
+        <div class="card-body">
+            <p>¿Confirmás que querés eliminar el tipo <strong>@Model.Nombre</strong>?</p>
+            <form asp-action="Eliminar" asp-route-id="@Model.IdTipoInmueble" method="post">
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Cancelar</a>
+                    <button type="submit" class="btn btn-danger"><i class="bi bi-trash-fill"></i> Confirmar eliminación</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,28 @@
+@model TipoInmueble
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Editar Tipo de Inmueble</h2>
+        </div>
+        <div class="card-body">
+            <form asp-action="Editar" asp-route-id="@Model.IdTipoInmueble" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger" role="alert">@ViewBag.Error</div>
+                }
+                <input asp-for="IdTipoInmueble" type="hidden" />
+                <div class="mb-3">
+                    <label asp-for="Nombre" class="form-label">Nombre</label>
+                    <input asp-for="Nombre" class="form-control" autofocus />
+                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Cancelar</a>
+                    <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
