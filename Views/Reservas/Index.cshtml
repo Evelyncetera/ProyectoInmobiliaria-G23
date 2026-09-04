@@ -25,6 +25,16 @@
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover table-striped mb-0 align-middle">
+                    <colgroup>
+                        <col />
+                        <col />
+                        <col />
+                        <col />
+                        <col />
+                        <col />
+                        <col />
+                        <col style="width: 380px;" />
+                    </colgroup>
                     <thead class="table-dark">
                         <tr>
                             <th>Código</th>
@@ -45,11 +55,11 @@
                             var vigente = !reserva.Anulada && reserva.FechaDesde <= DateTime.Today && reserva.FechaHasta >= DateTime.Today;
                             <tr class="@(reserva.Anulada ? "table-secondary" : vigente ? "table-success" : "")">
                                 <td class="fw-bold">@reserva.IdReserva</td>
-                                <td>@reserva.NombreInquilino @reserva.ApellidoInquilino <small class="text-muted">(@reserva.DniInquilino)</small></td>
-                                <td>@reserva.DireccionInmueble</td>
-                                <td>@reserva.FechaDesde.ToString("dd/MM/yyyy")</td>
-                                <td>@reserva.FechaHasta.ToString("dd/MM/yyyy")</td>
-                                <td>@reserva.MontoPorDia.ToString("C")</td>
+                                <td class="text-wrap">@reserva.NombreInquilino @reserva.ApellidoInquilino <small class="text-muted">(@reserva.DniInquilino)</small></td>
+                                <td class="text-wrap">@reserva.DireccionInmueble</td>
+                                <td class="text-nowrap">@reserva.FechaDesde.ToString("dd/MM/yyyy")</td>
+                                <td class="text-nowrap">@reserva.FechaHasta.ToString("dd/MM/yyyy")</td>
+                                <td class="text-nowrap">@reserva.MontoPorDia.ToString("C")</td>
                                 <td>
                                     @if (reserva.Anulada)
                                     {
@@ -68,16 +78,24 @@
                                         <span class="badge bg-info text-dark"><i class="bi bi-calendar-event-fill"></i> Programada</span>
                                     }
                                 </td>
-                                <td class="text-center">
-                                    <div class="btn-group" role="group">
-                                        <a asp-action="Detalles" asp-route-id="@reserva.IdReserva" class="btn btn-info btn-sm text-white"><i class="bi bi-eye-fill"></i> Detalles</a>
-                                        <a asp-action="Editar" asp-route-id="@reserva.IdReserva" class="btn btn-warning btn-sm"><i class="bi bi-pencil-fill"></i> Editar</a>
-                                        <a asp-action="Extender" asp-route-id="@reserva.IdReserva" class="btn btn-primary btn-sm"><i class="bi bi-arrow-repeat"></i> Renovar</a>
+                                <td class="text-center" style="width: 280px; min-width: 280px;">
+                                    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-1" role="group">
+                                        <div class="col">
+                                            <a asp-action="Detalles" asp-route-id="@reserva.IdReserva" class="btn btn-info btn-sm text-white text-wrap w-100"><i class="bi bi-eye-fill"></i> Detalles</a>
+                                        </div>
+                                        <div class="col">
+                                            <a asp-action="Editar" asp-route-id="@reserva.IdReserva" class="btn btn-warning btn-sm text-wrap w-100"><i class="bi bi-pencil-fill"></i> Editar</a>
+                                        </div>
+                                        <div class="col">
+                                            <a asp-action="Extender" asp-route-id="@reserva.IdReserva" class="btn btn-primary btn-sm text-wrap w-100"><i class="bi bi-arrow-repeat"></i> Renovar</a>
+                                        </div>
                                         @if (!reserva.Anulada)
                                         {
-                                            <form asp-action="Eliminar" asp-route-id="@reserva.IdReserva" method="post" class="d-inline" onsubmit="return confirm('¿Anular la reserva @reserva.IdReserva de @reserva.NombreInquilino @reserva.ApellidoInquilino? Esta acción no se puede deshacer.');">
-                                                <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash-fill"></i> Anular</button>
-                                            </form>
+                                            <div class="col">
+                                                <form asp-action="Eliminar" asp-route-id="@reserva.IdReserva" method="post" class="w-100" onsubmit="return confirm('¿Anular la reserva @reserva.IdReserva de @reserva.NombreInquilino @reserva.ApellidoInquilino? Esta acción no se puede deshacer.');">
+                                                    <button type="submit" class="btn btn-danger btn-sm text-wrap w-100"><i class="bi bi-trash-fill"></i> Anular</button>
+                                                </form>
+                                            </div>
                                         }
                                     </div>
                                 </td>

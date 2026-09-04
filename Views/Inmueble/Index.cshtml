@@ -10,6 +10,14 @@
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover table-striped mb-0 align-middle">
+                    <colgroup>
+                        <col style="width: 25%;" />
+                        <col style="width: 10%;" />
+                        <col style="width: 10%;" />
+                        <col style="width: 15%;" />
+                        <col style="width: 12%;" />
+                        <col style="width: 28%;" />
+                    </colgroup>
                     <thead class="table-dark">
                         <tr>
                             <th>Dirección</th>
@@ -32,12 +40,18 @@
                                 <td>@inmueble.PrecioPorDia.ToString("C")</td>
                                 <td><span class="badge @(inmueble.Disponible ? "bg-success" : "bg-secondary")">@(inmueble.Disponible ? "Disponible" : "No disponible")</span></td>
                                 <td class="text-center">
-                                    <div class="btn-group" role="group">
-                                        <a asp-action="Detalles" asp-route-id="@inmueble.IdInmueble" class="btn btn-info btn-sm text-white"><i class="bi bi-eye-fill"></i> Detalles</a>
-                                        <a asp-action="Editar" asp-route-id="@inmueble.IdInmueble" class="btn btn-warning btn-sm"><i class="bi bi-pencil-fill"></i> Editar</a>
-                                        <form asp-action="Eliminar" asp-route-id="@inmueble.IdInmueble" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar este inmueble? Esta acción no se puede deshacer.');">
-                                            <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash-fill"></i> Eliminar</button>
-                                        </form>
+                                    <div class="row row-cols-1 row-cols-md-3 g-1" role="group">
+                                        <div class="col">
+                                            <a asp-action="Detalles" asp-route-id="@inmueble.IdInmueble" class="btn btn-info btn-sm text-white w-100"><i class="bi bi-eye-fill"></i> Detalles</a>
+                                        </div>
+                                        <div class="col">
+                                            <a asp-action="Editar" asp-route-id="@inmueble.IdInmueble" class="btn btn-warning btn-sm w-100"><i class="bi bi-pencil-fill"></i> Editar</a>
+                                        </div>
+                                        <div class="col">
+                                            <form asp-action="Eliminar" asp-route-id="@inmueble.IdInmueble" method="post" class="w-100" onsubmit="return confirm('¿Eliminar este inmueble? Esta acción no se puede deshacer.');">
+                                                <button type="submit" class="btn btn-danger btn-sm w-100"><i class="bi bi-trash-fill"></i> Eliminar</button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
