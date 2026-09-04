@@ -9,6 +9,7 @@
 * **Evelyn Cetera** - *evelyncetera@gmail.com* - [@Evelyncetera](https://github.com/Evelyncetera) - Discord: `evelyn_56580`
 * **Matias Correa** - *matigc90@gmail.com* - [@mgc90](https://github.com/mgc90) - Discord: `mattyass90`
 * **Christian Villegas** - *villegaschristian16@gmail.com* - [@christian-2001](https://github.com/christian-2001) - Discord: `christian_villegas_2001`
+* **Mauricio Barca** - *mauriciobarca1989@gmail.com* - [@Mbarca89](https://github.com/Mbarca89)
 
 ---
 ## Instrucciones para levantar la Base de Datos
