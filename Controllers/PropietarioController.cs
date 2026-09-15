@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using MySqlConnector;
 using Proyecto_Inmobiliaria.Models; 
 
 namespace Proyecto_Inmobiliaria.Controllers
 {
+    [Authorize]
     public class PropietariosController : Controller
     {
         private readonly IRepositorioPropietario _repositorio;

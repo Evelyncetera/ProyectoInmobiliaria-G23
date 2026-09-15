@@ -181,7 +181,27 @@ namespace Proyecto_Inmobiliaria.Models
             return res;
         }
 
-        // Método auxiliar privado para mapear el DataReader a un objeto Usuario
+        public int ActualizarPerfil(int idUsuario, string nombre, string apellido, string email)
+        {
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                const string sql = @"UPDATE usuario
+                                     SET nombre = @nombre, apellido = @apellido, email = @email
+                                     WHERE idUsuario = @idUsuario AND estado = 1;";
+
+                using (var command = new MySqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@nombre", nombre);
+                    command.Parameters.AddWithValue("@apellido", apellido);
+                    command.Parameters.AddWithValue("@email", email);
+                    command.Parameters.AddWithValue("@idUsuario", idUsuario);
+                    connection.Open();
+                    return command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        
         private static Usuario MapearUsuario(MySqlDataReader reader)
         {
             return new Usuario

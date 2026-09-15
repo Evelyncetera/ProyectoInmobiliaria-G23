@@ -1,0 +1,64 @@
+@model Proyecto_Inmobiliaria.Models.PerfilViewModel
+@{
+    ViewData["Title"] = "Mi perfil";
+}
+
+<h1>Mi perfil</h1>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <h2 class="h5">Datos personales</h2>
+        <form asp-action="Perfil" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="Nombre" class="form-label"></label>
+                <input asp-for="Nombre" class="form-control" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Apellido" class="form-label"></label>
+                <input asp-for="Apellido" class="form-control" />
+                <span asp-validation-for="Apellido" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Avatar" class="form-label">Avatar</label>
+                <input asp-for="Avatar" class="form-control" accept=".jpg,.jpeg,.png,.webp" />
+                <span asp-validation-for="Avatar" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar datos</button>
+        </form>
+    </div>
+
+    <div class="col-md-6">
+        <h2 class="h5">Cambiar contraseña</h2>
+        <form asp-action="CambiarClave" method="post">
+            <div class="mb-3">
+                <label class="form-label" for="ClaveActual">Contraseña actual</label>
+                <input class="form-control" type="password" id="ClaveActual" name="ClaveActual" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="ClaveNueva">Nueva contraseña</label>
+                <input class="form-control" type="password" id="ClaveNueva" name="ClaveNueva" minlength="6" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="ConfirmarClave">Repetir contraseña</label>
+                <input class="form-control" type="password" id="ConfirmarClave" name="ConfirmarClave" required />
+            </div>
+            <button type="submit" class="btn btn-outline-primary">Cambiar contraseña</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

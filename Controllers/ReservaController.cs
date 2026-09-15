@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MySqlConnector;
 using Proyecto_Inmobiliaria.Models;
+using System.Security.Claims;
 
 namespace Proyecto_Inmobiliaria.Controllers
 {
+    [Authorize]
     public class ReservasController : Controller
     {
         private readonly IRepositorioReserva _repositorio;
@@ -118,7 +121,7 @@ namespace Proyecto_Inmobiliaria.Controllers
                     return View(reserva);
                 }
 
-                _repositorio.Alta(reserva);
+                _repositorio.Alta(reserva, ObtenerIdUsuarioActual());
                 TempData["Mensaje"] = "Reserva registrada con éxito.";
                 return RedirectToAction(nameof(Index));
             }
@@ -241,6 +244,7 @@ namespace Proyecto_Inmobiliaria.Controllers
         }
 
         // GET: /Reservas/Eliminar/5
+        [Authorize(Roles = "Administrador")]
         [HttpGet]
         public IActionResult Eliminar(int id)
         {
@@ -268,13 +272,14 @@ namespace Proyecto_Inmobiliaria.Controllers
         }
 
         // POST: /Reservas/Eliminar/5 (Baja lógica: anula la reserva)
+        [Authorize(Roles = "Administrador")]
         [HttpPost, ActionName("Eliminar")]
         [ValidateAntiForgeryToken]
         public IActionResult EliminarConfirmado(int id)
         {
             try
             {
-                _repositorio.Baja(id);
+                _repositorio.Baja(id, ObtenerIdUsuarioActual());
                 TempData["Mensaje"] = "Reserva anulada correctamente.";
             }
             catch (MySqlException ex)
@@ -356,7 +361,7 @@ namespace Proyecto_Inmobiliaria.Controllers
                     return View(reserva);
                 }
 
-                _repositorio.Alta(reserva); // Genera una nueva reserva (la original queda intacta)
+                _repositorio.Alta(reserva, ObtenerIdUsuarioActual()); // Genera una nueva reserva (la original queda intacta)
                 TempData["Mensaje"] = "Reserva renovada/extendida con éxito. Se generó un nuevo alquiler.";
                 return RedirectToAction(nameof(Index));
             }
@@ -518,6 +523,14 @@ namespace Proyecto_Inmobiliaria.Controllers
                 TempData["Error"] = "No se pudo recuperar el reporte";
                 return View(new List<Inmueble>());
             }
+        }
+
+        private int ObtenerIdUsuarioActual()
+        {
+            var claim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.TryParse(claim, out var idUsuario)
+                ? idUsuario
+                : throw new InvalidOperationException("La sesión no contiene un usuario válido.");
         }
     }
 }

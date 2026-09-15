@@ -10,16 +10,16 @@ namespace Proyecto_Inmobiliaria.Models
 
         }
 
-        public int Alta(Reserva r)
+        public int Alta(Reserva r, int idUsuarioCreador)
         {
             int res = -1;
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
                 string sql = @"INSERT INTO reserva
                                 (id_inquilino, id_inmueble, fecha_desde, fecha_hasta,
-                                monto_por_dia, anulada)
+                                monto_por_dia, anulada, id_usuario_creador, fecha_creacion)
                                 VALUES (@id_inquilino, @id_inmueble, @fecha_desde, @fecha_hasta,
-                                        @monto_por_dia, @anulada)";
+                                    @monto_por_dia, @anulada, @id_usuario_creador, CURRENT_TIMESTAMP)";
 
                 using (MySqlCommand cmd = new MySqlCommand(sql, connection))
                 {
@@ -31,6 +31,7 @@ namespace Proyecto_Inmobiliaria.Models
                     cmd.Parameters.AddWithValue("@fecha_hasta", r.FechaHasta);
                     cmd.Parameters.AddWithValue("@monto_por_dia", r.MontoPorDia);
                     cmd.Parameters.AddWithValue("@anulada", r.Anulada);
+                    cmd.Parameters.AddWithValue("@id_usuario_creador", idUsuarioCreador);
 
                     connection.Open();
 
@@ -46,20 +47,23 @@ namespace Proyecto_Inmobiliaria.Models
         }
 
         // ----- BAJA LÓGICA (anula la reserva, conserva el historial) -----
-        public int Baja(int id)
+        public int Baja(int id, int idUsuarioAnulador)
         {
             int res = -1;
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
                 string sql = @"UPDATE reserva
-                                SET anulada = 1
-                                WHERE id = @id";
+                                SET anulada = 1,
+                                    id_usuario_anulador = @id_usuario_anulador,
+                                    fecha_anulacion = CURRENT_TIMESTAMP
+                                WHERE id = @id AND anulada = 0";
 
                 using (MySqlCommand cmd = new MySqlCommand(sql, connection))
                 {
                     cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@id", id);
+                    cmd.Parameters.AddWithValue("@id_usuario_anulador", idUsuarioAnulador);
 
                     connection.Open();
                     res = cmd.ExecuteNonQuery();
@@ -185,10 +189,16 @@ namespace Proyecto_Inmobiliaria.Models
             {
                 string sql = @"SELECT r.id, r.id_inquilino, r.id_inmueble,
                                 r.fecha_desde, r.fecha_hasta, r.monto_por_dia, r.anulada,
-                                i.nombre, i.apellido, i.dni, inm.direccion
+                                i.nombre, i.apellido, i.dni, inm.direccion,
+                                r.id_usuario_creador, r.fecha_creacion,
+                                r.id_usuario_anulador, r.fecha_anulacion,
+                                CONCAT(uc.nombre, ' ', uc.apellido) AS nombre_usuario_creador,
+                                CONCAT(ua.nombre, ' ', ua.apellido) AS nombre_usuario_anulador
                             FROM reserva r
                             INNER JOIN inquilino i ON i.id = r.id_inquilino
                             INNER JOIN inmueble inm ON inm.id = r.id_inmueble
+                            LEFT JOIN usuario uc ON uc.idUsuario = r.id_usuario_creador
+                            LEFT JOIN usuario ua ON ua.idUsuario = r.id_usuario_anulador
                             WHERE r.id = @id;";
 
                 using (MySqlCommand cmd = new MySqlCommand(sql, connection))
@@ -201,6 +211,24 @@ namespace Proyecto_Inmobiliaria.Models
                         if (reader.Read())
                         {
                             r = LeerReserva(reader);
+                            r.IdUsuarioCreador = reader.IsDBNull(reader.GetOrdinal("id_usuario_creador"))
+                                ? null
+                                : reader.GetInt32("id_usuario_creador");
+                            r.NombreUsuarioCreador = reader.IsDBNull(reader.GetOrdinal("nombre_usuario_creador"))
+                                ? null
+                                : reader.GetString("nombre_usuario_creador");
+                            r.FechaCreacion = reader.IsDBNull(reader.GetOrdinal("fecha_creacion"))
+                                ? default
+                                : reader.GetDateTime("fecha_creacion");
+                            r.IdUsuarioAnulador = reader.IsDBNull(reader.GetOrdinal("id_usuario_anulador"))
+                                ? null
+                                : reader.GetInt32("id_usuario_anulador");
+                            r.NombreUsuarioAnulador = reader.IsDBNull(reader.GetOrdinal("nombre_usuario_anulador"))
+                                ? null
+                                : reader.GetString("nombre_usuario_anulador");
+                            r.FechaAnulacion = reader.IsDBNull(reader.GetOrdinal("fecha_anulacion"))
+                                ? null
+                                : reader.GetDateTime("fecha_anulacion");
                         }
                     }
                 }

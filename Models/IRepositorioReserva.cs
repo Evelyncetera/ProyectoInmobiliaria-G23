@@ -4,8 +4,8 @@ namespace Proyecto_Inmobiliaria.Models
 {
     public interface IRepositorioReserva
     {
-        int Alta(Reserva r);
-        int Baja(int id); //Baja lógica (anula la reserva)
+        int Alta(Reserva r, int idUsuarioCreador);
+        int Baja(int id, int idUsuarioAnulador); // Baja lógica (anula la reserva)
         int Modificacion(Reserva r);
         IList<Reserva> ObtenerTodos();
         Reserva? ObtenerPorId(int id);

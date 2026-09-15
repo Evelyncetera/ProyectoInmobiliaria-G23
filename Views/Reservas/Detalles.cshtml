@@ -43,6 +43,30 @@
                     }
                 </dd>
             </dl>
+
+            @if (User.IsInRole("Administrador"))
+            {
+                <hr />
+                <h3 class="h5">Auditoría</h3>
+                <dl class="row">
+                    <dt class="col-md-4">Creada por</dt>
+                    <dd class="col-md-8">
+                        @(Model.NombreUsuarioCreador ?? "Sin información")
+                        @if (Model.FechaCreacion != default)
+                        {
+                            <span>(@Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm"))</span>
+                        }
+                    </dd>
+                    <dt class="col-md-4">Anulada por</dt>
+                    <dd class="col-md-8">
+                        @(Model.NombreUsuarioAnulador ?? "No anulada")
+                        @if (Model.FechaAnulacion.HasValue)
+                        {
+                            <span>(@Model.FechaAnulacion.Value.ToString("dd/MM/yyyy HH:mm"))</span>
+                        }
+                    </dd>
+                </dl>
+            }
             <div class="d-flex justify-content-between">
                 <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Volver</a>
                 <div>

@@ -26,6 +26,17 @@ CREATE TABLE IF NOT EXISTS `tipo_inmueble` (
   `nombre` VARCHAR(100) NOT NULL UNIQUE
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS `usuario` (
+  `idUsuario` INT AUTO_INCREMENT PRIMARY KEY,
+  `nombre` VARCHAR(50) NOT NULL,
+  `apellido` VARCHAR(50) NOT NULL,
+  `email` VARCHAR(100) NOT NULL UNIQUE,
+  `clave` VARCHAR(255) NOT NULL,
+  `avatarUrl` VARCHAR(500) NULL,
+  `rol` ENUM('Administrador', 'Empleado') NOT NULL DEFAULT 'Empleado',
+  `estado` BOOLEAN NOT NULL DEFAULT TRUE
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS `inmueble` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `id_propietario` INT NOT NULL,
@@ -65,6 +76,10 @@ CREATE TABLE IF NOT EXISTS `reserva` (
     `fecha_hasta` DATE NOT NULL,
     `monto_por_dia` DECIMAL(12,2) NOT NULL,
     `anulada` BOOLEAN NOT NULL DEFAULT FALSE,
+    `id_usuario_creador` INT NULL,
+    `fecha_creacion` DATETIME NULL,
+    `id_usuario_anulador` INT NULL,
+    `fecha_anulacion` DATETIME NULL,
 
     CONSTRAINT `fk_reserva_inquilino`
         FOREIGN KEY (`id_inquilino`)
@@ -73,6 +88,14 @@ CREATE TABLE IF NOT EXISTS `reserva` (
     CONSTRAINT `fk_reserva_inmueble`
         FOREIGN KEY (`id_inmueble`)
         REFERENCES `inmueble` (`id`),
+
+    CONSTRAINT `fk_reserva_usuario_creador`
+      FOREIGN KEY (`id_usuario_creador`)
+      REFERENCES `usuario` (`idUsuario`),
+
+    CONSTRAINT `fk_reserva_usuario_anulador`
+      FOREIGN KEY (`id_usuario_anulador`)
+      REFERENCES `usuario` (`idUsuario`),
 
     CONSTRAINT `chk_reserva_fechas`
         CHECK (`fecha_hasta` >= `fecha_desde`),

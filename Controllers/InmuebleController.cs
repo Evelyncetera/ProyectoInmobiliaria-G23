@@ -3,8 +3,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using MySqlConnector;
 using Proyecto_Inmobiliaria.Models;
 
+using Microsoft.AspNetCore.Authorization;
+
 namespace Proyecto_Inmobiliaria.Controllers
 {
+    [Authorize]
     public class InmuebleController : Controller
     {
         private readonly IRepositorioInmueble _repositorio;

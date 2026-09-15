@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using MySqlConnector;
 using Proyecto_Inmobiliaria.Models;
 
 namespace Proyecto_Inmobiliaria.Controllers
 {
+    [Authorize]
     public class TipoInmuebleController : Controller
     {
         private readonly IRepositorioTipoInmueble _repositorio;
@@ -171,6 +173,7 @@ namespace Proyecto_Inmobiliaria.Controllers
         }
  */
         // POST: /TipoInmuebles/Eliminar/5
+        [Authorize(Roles = "Administrador")]
         [HttpPost, ActionName("Eliminar")]
         [ValidateAntiForgeryToken]
         public IActionResult EliminarConfirmado(int id)

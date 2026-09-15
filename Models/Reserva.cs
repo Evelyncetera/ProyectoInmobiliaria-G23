@@ -34,6 +34,13 @@ namespace Proyecto_Inmobiliaria.Models
         [Display(Name = "Anulada")]
         public bool Anulada { get; set; } = false;
 
+        public int? IdUsuarioCreador { get; set; }
+        public string? NombreUsuarioCreador { get; set; }
+        public DateTime FechaCreacion { get; set; }
+        public int? IdUsuarioAnulador { get; set; }
+        public string? NombreUsuarioAnulador { get; set; }
+        public DateTime? FechaAnulacion { get; set; }
+
         /* ----- Campos enriquecidos (se completan con JOINs en el repositorio) ----- */
         [Display(Name = "Nombre del inquilino")]
         public string NombreInquilino { get; set; } = "";
