@@ -1,9 +1,16 @@
 using Proyecto_Inmobiliaria.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme) 
+    .AddCookie(options => 
+    { 
+        options.LoginPath = "/Usuarios/Login"; 
+        options.AccessDeniedPath = "/Home/Restringido"; 
+    });
 
 // registro de repositorios
 builder.Services.AddScoped<IRepositorioPropietario, RepositorioPropietario>();
@@ -25,6 +32,8 @@ if (!app.Environment.IsDevelopment())
 
 /* app.UseHttpsRedirection(); */
 app.UseRouting();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
