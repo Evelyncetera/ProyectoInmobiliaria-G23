@@ -14,9 +14,9 @@ namespace Proyecto_Inmobiliaria.Controllers
 
 
         public ReservasController(IRepositorioReserva repositorio,
-                                  IRepositorioInquilino repositorioInquilino,
-                                  IRepositorioInmueble repositorioInmueble,
-                                  ILogger<ReservasController> logger)
+                                    IRepositorioInquilino repositorioInquilino,
+                                    IRepositorioInmueble repositorioInmueble,
+                                    ILogger<ReservasController> logger)
         {
             _repositorio = repositorio;
             _repositorioInquilino = repositorioInquilino;
@@ -24,7 +24,7 @@ namespace Proyecto_Inmobiliaria.Controllers
             _logger = logger;
         }
 
-      
+    
         private void CargarSelectLists()
         {
             var inquilinos = _repositorioInquilino.ObtenerTodos();
@@ -68,17 +68,24 @@ namespace Proyecto_Inmobiliaria.Controllers
             try
             {
                 CargarSelectLists();
-                return View(new Reserva());
+
+                var reserva = new Reserva
+                {
+                    FechaDesde = DateTime.Today,
+                    FechaHasta = DateTime.Today.AddDays(1)
+                };
+
+                return View(reserva);
             }
             catch (MySqlException ex)
             {
-                _logger.LogError(ex, "Error de base de datos al preparar el alta de una reserva");
+                _logger.LogError(ex, "Error de base de datos al cargar el formulario de reserva");
                 TempData["Error"] = "Ocurrió un error de conexión a la base de datos";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error inesperado al preparar el alta de una reserva");
+                _logger.LogError(ex, "Error inesperado al cargar el formulario de reserva");
                 TempData["Error"] = "No se pudo cargar el formulario";
                 return RedirectToAction(nameof(Index));
             }

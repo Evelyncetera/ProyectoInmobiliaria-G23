@@ -69,7 +69,7 @@ namespace Proyecto_Inmobiliaria.Models
             return res;
         }
 
-     
+    
         public int Modificacion(Reserva r)
         {
             int res = -1;
@@ -105,17 +105,23 @@ namespace Proyecto_Inmobiliaria.Models
         // ----- VERIFICAR DISPONIBILIDAD DEL INMUEBLE -----
         public bool EstaDisponible(int idInmueble, DateTime desde, DateTime hasta, int? exceptoId = null)
         {
-            bool disponible = true;
+            bool disponible = false;
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
                 string sql = @"SELECT COUNT(*)
-                                FROM reserva
-                                WHERE anulada = 0
-                                  AND id_inmueble = @id_inmueble
-                                  AND fecha_desde <= @hasta
-                                  AND fecha_hasta >= @desde
-                                  AND (@exceptoId IS NULL OR id <> @exceptoId)";
+                        FROM inmueble inm
+                        WHERE inm.id = @id_inmueble
+                            AND inm.disponible = 1
+                            AND NOT EXISTS (
+                                SELECT 1
+                                FROM reserva r
+                                WHERE r.id_inmueble = inm.id
+                                AND r.anulada = 0
+                                AND r.fecha_desde <= @hasta
+                                AND r.fecha_hasta >= @desde
+                                AND (@exceptoId IS NULL OR r.id <> @exceptoId)
+                            )";
 
                 using (MySqlCommand cmd = new MySqlCommand(sql, connection))
                 {
@@ -131,8 +137,7 @@ namespace Proyecto_Inmobiliaria.Models
                     {
                         if (reader.Read())
                         {
-                            int ocupadas = reader.GetInt32(0);
-                            disponible = ocupadas == 0;
+                            disponible = reader.GetInt32(0) > 0;
                         }
                     }
                     connection.Close();
@@ -141,7 +146,7 @@ namespace Proyecto_Inmobiliaria.Models
             return disponible;
         }
 
-      
+    
         public IList<Reserva> ObtenerTodos()
         {
             IList<Reserva> reservas = new List<Reserva>();
@@ -215,8 +220,8 @@ namespace Proyecto_Inmobiliaria.Models
                         INNER JOIN inquilino i ON i.id = r.id_inquilino
                         INNER JOIN inmueble inm ON inm.id = r.id_inmueble
                         WHERE r.anulada = 0
-                          AND r.fecha_desde <= CURDATE()
-                          AND r.fecha_hasta >= CURDATE()
+                            AND r.fecha_desde <= CURDATE()
+                            AND r.fecha_hasta >= CURDATE()
                         ORDER BY r.fecha_hasta ASC;";
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
@@ -249,8 +254,8 @@ namespace Proyecto_Inmobiliaria.Models
                         INNER JOIN inquilino i ON i.id = r.id_inquilino
                         INNER JOIN inmueble inm ON inm.id = r.id_inmueble
                         WHERE r.anulada = 0
-                          AND r.fecha_hasta BETWEEN CURDATE()
-                              AND DATE_ADD(CURDATE(), INTERVAL @dias DAY)
+                            AND r.fecha_hasta BETWEEN CURDATE()
+                                AND DATE_ADD(CURDATE(), INTERVAL @dias DAY)
                         ORDER BY r.fecha_hasta ASC;";
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
@@ -320,9 +325,9 @@ namespace Proyecto_Inmobiliaria.Models
                         WHERE NOT EXISTS (
                             SELECT 1 FROM reserva r
                             WHERE r.id_inmueble = inm.id
-                              AND r.anulada = 0
-                              AND r.fecha_hasta >= DATE_SUB(CURDATE(), INTERVAL @dias DAY)
-                              AND r.fecha_desde <= CURDATE()
+                                AND r.anulada = 0
+                                AND r.fecha_hasta >= DATE_SUB(CURDATE(), INTERVAL @dias DAY)
+                                AND r.fecha_desde <= CURDATE()
                         );";
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
@@ -366,13 +371,14 @@ namespace Proyecto_Inmobiliaria.Models
                             inm.direccion, inm.cupo, inm.latitud, inm.longitud,
                             inm.precio_por_dia, inm.porcentaje_reserva, inm.disponible
                         FROM inmueble inm
-                        WHERE NOT EXISTS (
-                            SELECT 1 FROM reserva r
-                            WHERE r.id_inmueble = inm.id
-                              AND r.anulada = 0
-                              AND r.fecha_desde <= @hasta
-                              AND r.fecha_hasta >= @desde
-                        );";
+                        WHERE inm.disponible = 1
+                            AND NOT EXISTS (
+                                SELECT 1 FROM reserva r
+                                WHERE r.id_inmueble = inm.id
+                                    AND r.anulada = 0
+                                    AND r.fecha_desde <= @hasta
+                                    AND r.fecha_hasta >= @desde
+                            );";
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {

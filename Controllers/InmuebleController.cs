@@ -90,15 +90,17 @@ namespace Proyecto_Inmobiliaria.Controllers
             catch (MySqlException ex)
             {
                 _logger.LogError(ex, "Error de base de datos al guardar el inmueble");
-                ViewBag.Error = ex.Number == 1062
-                    ? "Ya existe un inmueble con esta dirección."
-                    : "Ocurrió un error de conexión a la base de datos";
+                ViewBag.Error = ex.Number == 1062 ? "Ya existe un inmueble con esta dirección." : "Ocurrió un error de base de datos al guardar el inmueble.";
+
+                CargarSelectLists();
                 return View(inmueble);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error inesperado al guardar el inmueble");
-                ViewBag.Error = "Ocurrió un error al guardar";
+                ViewBag.Error = "Ocurrió un error al guardar el inmueble.";
+
+                CargarSelectLists();
                 return View(inmueble);
             }
         }
@@ -107,6 +109,7 @@ namespace Proyecto_Inmobiliaria.Controllers
         [HttpGet]
         public IActionResult Editar(int id)
         {
+            
             try
             {
                 var inmueble = _repositorio.ObtenerPorId(id);
@@ -171,7 +174,7 @@ namespace Proyecto_Inmobiliaria.Controllers
 
             try
             {
-                CargarSelectLists();
+
                 _repositorio.Modificacion(inmueble);
                 TempData["Mensaje"] = "Inmueble modificado con éxito.";
                 return RedirectToAction(nameof(Index));
@@ -179,21 +182,23 @@ namespace Proyecto_Inmobiliaria.Controllers
             catch (MySqlException ex)
             {
                 _logger.LogError(ex, "Error de base de datos al modificar el inmueble {IdInmueble}", id);
-                ViewBag.Error = ex.Number == 1062
-                    ? "Ya existe un inmueble con esta dirección."
-                    : "Ocurrió un error de conexión a la base de datos";
+                ViewBag.Error = ex.Number == 1062 ? "Ya existe un inmueble con esta dirección." : "Ocurrió un error de conexión a la base de datos";
+                
+                CargarSelectLists();
                 return View(inmueble);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error inesperado al modificar el inmueble {IdInmueble}", id);
                 ViewBag.Error = "Ocurrió un error al modificar el inmueble";
+                
+                CargarSelectLists();
                 return View(inmueble);
             }
         }
 
         // GET: /Inmuebles/Eliminar/5
- /*        [HttpGet]
+/*        [HttpGet]
         public IActionResult Eliminar(int id)
         {
             try

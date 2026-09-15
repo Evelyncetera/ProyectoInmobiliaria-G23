@@ -143,7 +143,7 @@ namespace Proyecto_Inmobiliaria.Controllers
             }
         }
 
-        // GET: /TipoInmuebles/Eliminar/5
+/*         // GET: /TipoInmuebles/Eliminar/5
         [HttpGet]
         public IActionResult Eliminar(int id)
         {
@@ -169,7 +169,7 @@ namespace Proyecto_Inmobiliaria.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
-
+ */
         // POST: /TipoInmuebles/Eliminar/5
         [HttpPost, ActionName("Eliminar")]
         [ValidateAntiForgeryToken]
@@ -182,8 +182,15 @@ namespace Proyecto_Inmobiliaria.Controllers
             }
             catch (MySqlException ex)
             {
-                _logger.LogError(ex, "Error de base de datos al eliminar el tipo de inmueble {IdTipoInmueble}", id);
-                TempData["Error"] = "Ocurrió un error de conexión a la base de datos";
+                _logger.LogError(ex,
+                    "Error de base de datos al eliminar el tipo de inmueble {IdTipoInmueble}", id);
+
+                if (ex.Number == 1451) {
+                    TempData["Error"] = "No se puede eliminar el tipo de inmueble porque tiene inmuebles asociados.";
+                }
+                else {
+                    TempData["Error"] = "Ocurrió un error de base de datos al eliminar el tipo de inmueble.";
+                }
             }
             catch (Exception ex)
             {
