@@ -165,7 +165,7 @@ namespace Proyecto_Inmobiliaria.Controllers
         }
 
         // GET: /Propietarios/Eliminar/5
-        [HttpGet]
+  /*       [HttpGet]
         public IActionResult Eliminar(int id)
         {
             try
@@ -189,7 +189,7 @@ namespace Proyecto_Inmobiliaria.Controllers
                 TempData["Error"] = "Error al buscar propietario";
                 return RedirectToAction(nameof(Index));
             }
-        }
+        } */
 
         // POST: /Propietarios/Eliminar/5
         [HttpPost, ActionName("Eliminar")]
@@ -203,8 +203,19 @@ namespace Proyecto_Inmobiliaria.Controllers
             }
             catch (MySqlException ex)
             {
-                _logger.LogError(ex, "Error de base de datos al eliminar el propietario {IdPropietario}", id);
-                TempData["Error"] = "Ocurrió un error de conexión a la base de datos";
+                _logger.LogError(ex,
+                    "Error de base de datos al eliminar el propietario {IdPropietario}", id);
+
+                if (ex.Number == 1451)
+                {
+                    TempData["Error"] =
+                        "No se puede eliminar el propietario porque tiene inmuebles asociados.";
+                }
+                else
+                {
+                    TempData["Error"] =
+                        "Ocurrió un error de base de datos al eliminar el propietario.";
+                }
             }
             catch (Exception ex)
             {

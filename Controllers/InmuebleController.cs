@@ -14,10 +14,10 @@ namespace Proyecto_Inmobiliaria.Controllers
         private readonly ILogger<InmuebleController> _logger;
 
         // El framework inyecta automáticamente el repositorio configurado
-        public InmuebleController(IRepositorioInmueble repositorio,
-                                  IRepositorioPropietario repositorioPropietario,
-                                  IRepositorioTipoInmueble repositorioTipoInmueble,
-                                  ILogger<InmuebleController> logger)
+            public InmuebleController(IRepositorioInmueble repositorio,
+                                    IRepositorioPropietario repositorioPropietario,
+                                    IRepositorioTipoInmueble repositorioTipoInmueble,
+                                    ILogger<InmuebleController> logger)
         {
             _repositorio = repositorio;
             _repositorioPropietario = repositorioPropietario;
@@ -77,6 +77,7 @@ namespace Proyecto_Inmobiliaria.Controllers
         {
             if (!ModelState.IsValid)
             {
+                CargarSelectLists();
                 return View(inmueble);
             }
 
@@ -192,7 +193,7 @@ namespace Proyecto_Inmobiliaria.Controllers
         }
 
         // GET: /Inmuebles/Eliminar/5
-        [HttpGet]
+ /*        [HttpGet]
         public IActionResult Eliminar(int id)
         {
             try
@@ -216,7 +217,7 @@ namespace Proyecto_Inmobiliaria.Controllers
                 TempData["Error"] = "Error al buscar inmueble";
                 return RedirectToAction(nameof(Index));
             }
-        }
+        } */
 
         // POST: /Inmuebles/Eliminar/5
         [HttpPost, ActionName("Eliminar")]
@@ -228,15 +229,25 @@ namespace Proyecto_Inmobiliaria.Controllers
                 _repositorio.Baja(id);
                 TempData["Mensaje"] = "Inmueble eliminado correctamente.";
             }
-            catch (MySqlException ex)
+            catch(MySqlException ex)
             {
                 _logger.LogError(ex, "Error de base de datos al eliminar el inmueble {IdInmueble}", id);
-                TempData["Error"] = "Ocurrió un error de conexión a la base de datos";
+
+                if (ex.Number == 1451)
+                {
+                    TempData["Error"] = "No se puede eliminar el inmueble porque tiene reservas asociadas.";
+                }
+                else
+                {
+                    TempData["Error"] = "Ocurrió un error de base de datos al eliminar el inmueble.";
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error inesperado al eliminar el inmueble {IdInmueble}", id);
-                TempData["Error"] = "No se pudo dar de baja al inmueble";
+                _logger.LogError(ex,
+                    "Error inesperado al eliminar el inmueble {IdInmueble}", id);
+
+                TempData["Error"] = "No se pudo dar de baja al inmueble.";
             }
             return RedirectToAction(nameof(Index));
         }

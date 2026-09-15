@@ -164,31 +164,31 @@ namespace Proyecto_Inmobiliaria.Controllers
         }
 
         // GET: /Inquilinos/Eliminar/5
-        [HttpGet]
-        public IActionResult Eliminar(int id)
+/*     [HttpGet]
+    public IActionResult Eliminar(int id)
+    {
+        try
         {
-            try
+            var inquilino = _repositorio.ObtenerPorId(id);
+            if (inquilino == null)
             {
-                var inquilino = _repositorio.ObtenerPorId(id);
-                if (inquilino == null)
-                {
-                    return NotFound();
-                }
-                return View(inquilino);
+                return NotFound();
             }
-            catch (MySqlException ex)
-            {
-                _logger.LogError(ex, "Error de base de datos al buscar el inquilino {IdInquilino} para eliminarlo", id);
-                TempData["Error"] = "Ocurrió un error de conexión a la base de datos";
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error inesperado al buscar el inquilino {IdInquilino} para eliminarlo", id);
-                TempData["Error"] = "Error al buscar inquilino";
-                return RedirectToAction(nameof(Index));
-            }
+            return View(inquilino);
         }
+        catch (MySqlException ex)
+        {
+            _logger.LogError(ex, "Error de base de datos al buscar el inquilino {IdInquilino} para eliminarlo", id);
+            TempData["Error"] = "Ocurrió un error de conexión a la base de datos";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error inesperado al buscar el inquilino {IdInquilino} para eliminarlo", id);
+            TempData["Error"] = "Error al buscar inquilino";
+            return RedirectToAction(nameof(Index));
+        }
+    } */
 
         // POST: /Inquilinos/Eliminar/5
         [HttpPost, ActionName("Eliminar")]
@@ -202,8 +202,19 @@ namespace Proyecto_Inmobiliaria.Controllers
             }
             catch (MySqlException ex)
             {
-                _logger.LogError(ex, "Error de base de datos al eliminar el inquilino {IdInquilino}", id);
-                TempData["Error"] = "Ocurrió un error de conexión a la base de datos";
+                _logger.LogError(ex,
+                    "Error de base de datos al eliminar el inquilino {IdInquilino}", id);
+
+                if (ex.Number == 1451)
+                {
+                    TempData["Error"] =
+                        "No se puede eliminar el inquilino porque tiene reservas asociadas.";
+                }
+                else
+                {
+                    TempData["Error"] =
+                        "Ocurrió un error de base de datos al eliminar el inquilino.";
+                }
             }
             catch (Exception ex)
             {

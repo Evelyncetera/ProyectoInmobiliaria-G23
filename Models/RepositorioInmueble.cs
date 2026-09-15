@@ -43,7 +43,7 @@ namespace Proyecto_Inmobiliaria.Models
                     cmd.ExecuteNonQuery();
 
                     res = (int)cmd.LastInsertedId;
-                    i.IdTipoInmueble = res;
+                    i.IdInmueble = res;
 
                     connection.Close();
                 }
