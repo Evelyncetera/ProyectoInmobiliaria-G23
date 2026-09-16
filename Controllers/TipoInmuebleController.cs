@@ -145,7 +145,8 @@ namespace Proyecto_Inmobiliaria.Controllers
             }
         }
 
-/*         // GET: /TipoInmuebles/Eliminar/5
+// GET: /TipoInmuebles/Eliminar/5
+        [Authorize(Roles = "Administrador")]
         [HttpGet]
         public IActionResult Eliminar(int id)
         {
@@ -171,7 +172,7 @@ namespace Proyecto_Inmobiliaria.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
- */
+
         // POST: /TipoInmuebles/Eliminar/5
         [Authorize(Roles = "Administrador")]
         [HttpPost, ActionName("Eliminar")]

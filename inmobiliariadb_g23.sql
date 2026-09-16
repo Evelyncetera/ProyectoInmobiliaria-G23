@@ -247,3 +247,26 @@ WHERE i.dni = '33333333'
         AND r.fecha_desde = DATE_SUB(CURDATE(), INTERVAL 10 DAY)
         AND r.anulada = TRUE
   );
+
+
+/* usuario admin de prueba*/
+
+INSERT INTO usuario
+    (nombre, apellido, email, clave, rol, estado)
+VALUES
+    ('Administrador', 'Sistema', 'admin@inmobiliaria.com',
+     'AQAAAAIAAYagAAAAEAzN+oct2QSGQ+GPzy4VTjkrhtLtXQ7oxfClpwMNx5fc6yT7km9qMq3jVBE+NaUH3Q==', 'Administrador', TRUE)
+ON DUPLICATE KEY UPDATE
+    rol = 'Administrador',
+    estado = TRUE;
+
+/* usuario empleado de prueba */
+INSERT INTO usuario
+    (nombre, apellido, email, clave, rol, estado)
+VALUES
+    ('Empleado', 'Prueba', 'empleado@inmobiliaria.com',
+     'AQAAAAIAAYagAAAAEAzN+oct2QSGQ+GPzy4VTjkrhtLtXQ7oxfClpwMNx5fc6yT7km9qMq3jVBE+NaUH3Q==',
+     'Empleado', TRUE)
+ON DUPLICATE KEY UPDATE
+    rol = 'Empleado',
+    estado = TRUE;
