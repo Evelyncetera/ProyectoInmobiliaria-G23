@@ -1,0 +1,101 @@
+@model InmueblesListadoViewModel
+@{ ViewData["Title"] = "Inmuebles"; }
+<div class="d-flex flex-wrap justify-content-between gap-2 my-4">
+    <h1>Inmuebles</h1>
+    <div>
+        <a asp-controller="TipoInmueble" asp-action="Index" class="btn btn-outline-primary">Tipos de inmueble</a>
+        <a asp-action="Crear" class="btn btn-primary">Registrar inmueble</a>
+    </div>
+</div>
+<form method="get" asp-action="Index" class="card card-body mb-4">
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label asp-for="Buscar" class="form-label">Dirección o nombre del propietario</label>
+            <input asp-for="Buscar" class="form-control" maxlength="200" type="search" />
+        </div>
+        <div class="col-md-6" data-selector-remoto>
+            <label for="buscar-propietario" class="form-label">Buscar propietario por nombre o DNI</label>
+            <div class="input-group mb-2">
+                <input id="buscar-propietario" class="form-control" type="search" maxlength="100" data-busqueda />
+                <button type="button" class="btn btn-outline-secondary" data-buscar>Buscar</button>
+            </div>
+            <label asp-for="Propietario" class="visually-hidden">Propietario</label>
+            <select asp-for="Propietario" asp-items="ViewBag.Propietarios" class="form-select" data-resultados data-url="@Url.Action("BuscarPropietarios")">
+                <option value="">Todos los propietarios</option>
+            </select>
+            <small class="text-muted" data-mensaje aria-live="polite"></small>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Disponible" class="form-label">Oferta</label>
+            <select asp-for="Disponible" class="form-select">
+                <option value="">Todas</option><option value="true">Disponible</option><option value="false">No disponible</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Estado" class="form-label">Estado del registro</label>
+            <select asp-for="Estado" class="form-select">
+                <option value="activos">Activos</option><option value="bajas">Dados de baja</option><option value="todos">Todos</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="TamanoPagina" class="form-label">Resultados por página</label>
+            <select asp-for="TamanoPagina" class="form-select">
+                <option value="10">10</option><option value="20">20</option><option value="50">50</option>
+            </select>
+        </div>
+    </div>
+    <div class="mt-3"><button type="submit" class="btn btn-primary">Filtrar</button> <a asp-action="Index" class="btn btn-outline-secondary">Limpiar</a></div>
+</form>
+<p>@Model.Total inmueble(s) encontrados.</p>
+<div class="table-responsive">
+<table class="table table-hover align-middle">
+    <thead><tr><th>Portada</th><th>Dirección / tipo</th><th>Propietario</th><th>Cupo</th><th>Precio por día</th><th>Estado</th><th>Acciones</th></tr></thead>
+    <tbody>
+    @foreach (var inmueble in Model.Items)
+    {
+        <tr>
+            <td>
+                @if (inmueble.IdPortada.HasValue)
+                {
+                    <img src="@Url.Action("Imagen", new { id = inmueble.IdPortada })" alt="Portada de @inmueble.Direccion" width="100" height="70" style="object-fit:cover" loading="lazy" class="rounded" />
+                }
+                else { <span class="text-muted">Sin imagen</span> }
+            </td>
+            <td>@inmueble.Direccion<br /><small class="text-muted">@inmueble.NombreTipo</small></td>
+            <td>@inmueble.NombrePropietario</td>
+            <td>@inmueble.Cupo</td>
+            <td>@inmueble.PrecioPorDia.ToString("C")</td>
+            <td><span class="badge @(!inmueble.Estado ? "bg-danger" : inmueble.Disponible ? "bg-success" : "bg-secondary")">@(!inmueble.Estado ? "Baja" : inmueble.Disponible ? "Disponible" : "Suspendido")</span></td>
+            <td>
+                <div class="d-flex flex-wrap gap-1">
+                    <a asp-action="Detalles" asp-route-id="@inmueble.IdInmueble" class="btn btn-sm btn-outline-primary">Detalles</a>
+                    @if (inmueble.Estado)
+                    {
+                        <a asp-action="Editar" asp-route-id="@inmueble.IdInmueble" class="btn btn-sm btn-outline-secondary">Editar</a>
+                        @if (User.IsInRole("Administrador"))
+                        {
+                            <form asp-action="Eliminar" asp-route-id="@inmueble.IdInmueble" method="post" onsubmit="return confirm('¿Dar de baja este inmueble? Dejará de ofrecerse y conservará su historial.');">
+                                <button class="btn btn-sm btn-outline-danger" type="submit">Dar de baja</button>
+                            </form>
+                        }
+                    }
+                </div>
+            </td>
+        </tr>
+    }
+    @if (Model.Items.Count == 0) { <tr><td colspan="7" class="text-center py-4">No hay inmuebles para estos filtros.</td></tr> }
+    </tbody>
+</table>
+</div>
+<nav aria-label="Páginas de inmuebles" class="d-flex align-items-center gap-3 my-3">
+    @if (Model.Pagina > 1)
+    {
+        <a asp-action="Index" asp-route-pagina="@(Model.Pagina - 1)" asp-route-buscar="@Model.Buscar" asp-route-propietario="@Model.Propietario" asp-route-disponible="@Model.Disponible" asp-route-estado="@Model.Estado" asp-route-tamanoPagina="@Model.TamanoPagina" class="btn btn-outline-primary">Anterior</a>
+    }
+    <span>Página @Model.Pagina de @Model.TotalPaginas</span>
+    @if (Model.Pagina < Model.TotalPaginas)
+    {
+        <a asp-action="Index" asp-route-pagina="@(Model.Pagina + 1)" asp-route-buscar="@Model.Buscar" asp-route-propietario="@Model.Propietario" asp-route-disponible="@Model.Disponible" asp-route-estado="@Model.Estado" asp-route-tamanoPagina="@Model.TamanoPagina" class="btn btn-outline-primary">Siguiente</a>
+    }
+</nav>
+<script src="~/js/inmuebles.js" asp-append-version="true" defer></script>

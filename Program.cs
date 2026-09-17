@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddTransient<Proyecto_Inmobiliaria.Services.CompresorImagenes>();
 builder.Services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme) 
     .AddCookie(options => 
