@@ -1,0 +1,12 @@
+namespace Proyecto_Inmobiliaria.Models;
+
+    
+public interface IRepositorioPago
+{
+    int Alta(Pago p);
+    int Baja(int id, int idUsuarioAnulador);
+    int Modificacion(Pago p);
+    IList<Pago> ObtenerTodos();
+    Pago? ObtenerPorId(int id);
+
+}
