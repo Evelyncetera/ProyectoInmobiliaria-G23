@@ -44,6 +44,7 @@
                 </dd>
             </dl>
 
+
             @if (User.IsInRole("Administrador"))
             {
                 <hr />
@@ -70,10 +71,9 @@
             <div class="d-flex justify-content-between">
                 <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Volver</a>
                 <div>
+                    <a asp-controller="Pago" asp-action="Crear" asp-route-id="@Model.IdReserva" class="btn btn-success"><i class="bi bi-cash"></i> Generar Nuevo Pago</a>
                     <a asp-action="Extender" asp-route-id="@Model.IdReserva" class="btn btn-primary"><i class="bi bi-arrow-repeat"></i> Renovar/Extender</a>
                     <a asp-action="Editar" asp-route-id="@Model.IdReserva" class="btn btn-warning text-dark"><i class="bi bi-pencil-fill"></i> Editar</a>
                 </div>
             </div>
         </div>
-    </div>
-</div>

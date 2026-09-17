@@ -22,7 +22,7 @@ namespace Proyecto_Inmobiliaria.Models
         [Display(Name = "Importe")]
         public decimal Importe { get; set; }
 
-        public bool Anulada { get; set; } = true;
+        public bool Anulada { get; set; } = false;
 
         public int? IdUsuarioCreador { get; set; }
         public string? NombreUsuarioCreador { get; set; }

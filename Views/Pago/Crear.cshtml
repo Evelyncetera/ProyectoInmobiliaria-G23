@@ -1,0 +1,49 @@
+@model Pago
+
+<div class="container mt-4  d-flex justify-content-center">
+    <div class="card shadow-sm w-50">
+        <div class="card-header bg-success text-white text-center">
+            <h2 class="mb-0">Registrar Nuevo Pago para la Reserva</h2>
+        </div>
+        <div class="card-body">
+            <form asp-action="Crear" method="post">
+                <input type="hidden" asp-for="IdPago" />
+                <input type="hidden" asp-for="IdReserva" />
+                <!-- Mensaje de resumen para validaciones generales -->
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill"></i> @ViewBag.Error
+                    </div>
+                }
+
+                <div class="row">
+                    <!-- Concepto -->
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Concepto" class="form-label font-weight-bold">Concepto</label>
+                        <input asp-for="Concepto" class="form-control" placeholder="Ej: Seña / Pago restante / Multa" required />
+                        <span asp-validation-for="Concepto" class="text-danger"></span>
+                    </div>
+
+                    <!-- Teléfono -->
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Importe" class="form-label font-weight-bold">Importe</label>
+                        <input asp-for="Importe" class="form-control" placeholder="Ej: 25000.00" />
+                        <span asp-validation-for="Importe" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="d-flex justify-content-center gap-2">
+                    <a asp-controller="Reservas" asp-action="Detalles" asp-route-id="@ViewBag.IdReserva" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver a la reserva
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-save"></i> Registrar Pago
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

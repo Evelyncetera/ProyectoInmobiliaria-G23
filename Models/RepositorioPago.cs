@@ -10,13 +10,13 @@ namespace Proyecto_Inmobiliaria.Models
 
         }
 
-        public int Alta(Pago p)
+        public int Alta(Pago p, int idUsuarioCreador)
         {
             int res = -1;
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
                 string sql = @"INSERT INTO pago (id_reserva, concepto, fecha_pago, importe, anulada, id_usuario_creador, fecha_creacion)
-                            VALUES (@id_reserva, @concepto, CURRENT_TIMESTAMP, @importe, @anulada, @id_usuario_creador, CURRENT_TIMESTAMP)";
+                            VALUES (@id_reserva, @concepto, CURDATE(), @importe, @anulada, @id_usuario_creador, CURRENT_TIMESTAMP)";
 
                 using (MySqlCommand cmd = new MySqlCommand(sql, connection))
                 {
@@ -26,6 +26,7 @@ namespace Proyecto_Inmobiliaria.Models
                     cmd.Parameters.AddWithValue("@concepto", p.Concepto);
                     cmd.Parameters.AddWithValue("@importe", p.Importe);
                     cmd.Parameters.AddWithValue("@anulado", p.Anulada);
+                    cmd.Parameters.AddWithValue("@id_usuario_creador", idUsuarioCreador);
 
                     connection.Open();
 
