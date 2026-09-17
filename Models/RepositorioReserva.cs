@@ -123,7 +123,7 @@ namespace Proyecto_Inmobiliaria.Models
                                 WHERE r.id_inmueble = inm.id
                                 AND r.anulada = 0
                                 AND r.fecha_desde <= @hasta
-                                AND r.fecha_hasta >= @desde
+                                AND COALESCE(r.fecha_terminacion, r.fecha_hasta) >= @desde
                                 AND (@exceptoId IS NULL OR r.id <> @exceptoId)
                             )";
 
@@ -190,15 +190,24 @@ namespace Proyecto_Inmobiliaria.Models
                 string sql = @"SELECT r.id, r.id_inquilino, r.id_inmueble,
                                 r.fecha_desde, r.fecha_hasta, r.monto_por_dia, r.anulada,
                                 i.nombre, i.apellido, i.dni, inm.direccion,
+
                                 r.id_usuario_creador, r.fecha_creacion,
                                 r.id_usuario_anulador, r.fecha_anulacion,
+                                r.fecha_terminacion, r.id_usuario_terminador,
+
                                 CONCAT(uc.nombre, ' ', uc.apellido) AS nombre_usuario_creador,
-                                CONCAT(ua.nombre, ' ', ua.apellido) AS nombre_usuario_anulador
+                                CONCAT(ua.nombre, ' ', ua.apellido) AS nombre_usuario_anulador,
+                                CONCAT(ut.nombre, ' ', ut.apellido) AS nombre_usuario_terminador
+
                             FROM reserva r
+
                             INNER JOIN inquilino i ON i.id = r.id_inquilino
                             INNER JOIN inmueble inm ON inm.id = r.id_inmueble
+
                             LEFT JOIN usuario uc ON uc.idUsuario = r.id_usuario_creador
                             LEFT JOIN usuario ua ON ua.idUsuario = r.id_usuario_anulador
+                            LEFT JOIN usuario ut ON ut.idUsuario = r.id_usuario_terminador
+
                             WHERE r.id = @id;";
 
                 using (MySqlCommand cmd = new MySqlCommand(sql, connection))
@@ -229,6 +238,17 @@ namespace Proyecto_Inmobiliaria.Models
                             r.FechaAnulacion = reader.IsDBNull(reader.GetOrdinal("fecha_anulacion"))
                                 ? null
                                 : reader.GetDateTime("fecha_anulacion");
+                            r.FechaTerminacion = reader.IsDBNull(reader.GetOrdinal("fecha_terminacion"))
+                                ? null
+                                : reader.GetDateTime("fecha_terminacion");
+
+                            r.IdUsuarioTerminador = reader.IsDBNull(reader.GetOrdinal("id_usuario_terminador"))
+                                ? null
+                                : reader.GetInt32("id_usuario_terminador");
+
+                            r.NombreUsuarioTerminador = reader.IsDBNull(reader.GetOrdinal("nombre_usuario_terminador"))
+                                ? null
+                                : reader.GetString("nombre_usuario_terminador");
                         }
                     }
                 }
@@ -249,8 +269,8 @@ namespace Proyecto_Inmobiliaria.Models
                         INNER JOIN inmueble inm ON inm.id = r.id_inmueble
                         WHERE r.anulada = 0
                             AND r.fecha_desde <= CURDATE()
-                            AND r.fecha_hasta >= CURDATE()
-                        ORDER BY r.fecha_hasta ASC;";
+                            AND COALESCE(r.fecha_terminacion, r.fecha_hasta) >= CURDATE()
+                    ORDER BY COALESCE(r.fecha_terminacion, r.fecha_hasta) ASC;";
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
@@ -282,9 +302,10 @@ namespace Proyecto_Inmobiliaria.Models
                         INNER JOIN inquilino i ON i.id = r.id_inquilino
                         INNER JOIN inmueble inm ON inm.id = r.id_inmueble
                         WHERE r.anulada = 0
-                            AND r.fecha_hasta BETWEEN CURDATE()
+                            AND COALESCE(r.fecha_terminacion, r.fecha_hasta)
+                                BETWEEN CURDATE()
                                 AND DATE_ADD(CURDATE(), INTERVAL @dias DAY)
-                        ORDER BY r.fecha_hasta ASC;";
+                        ORDER BY COALESCE(r.fecha_terminacion, r.fecha_hasta) ASC;";
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
@@ -314,6 +335,7 @@ namespace Proyecto_Inmobiliaria.Models
                         FROM inmueble inm
                         INNER JOIN reserva r ON r.id_inmueble = inm.id AND r.anulada = 0
                         WHERE r.fecha_desde >= DATE_SUB(CURDATE(), INTERVAL 365 DAY)
+                            AND r.fecha_desde <= CURDATE()
                         GROUP BY inm.id, inm.direccion
                         ORDER BY cantidad DESC;";
 
@@ -354,7 +376,8 @@ namespace Proyecto_Inmobiliaria.Models
                             SELECT 1 FROM reserva r
                             WHERE r.id_inmueble = inm.id
                                 AND r.anulada = 0
-                                AND r.fecha_hasta >= DATE_SUB(CURDATE(), INTERVAL @dias DAY)
+                                AND COALESCE(r.fecha_terminacion, r.fecha_hasta)
+                                    >= DATE_SUB(CURDATE(), INTERVAL @dias DAY)
                                 AND r.fecha_desde <= CURDATE()
                         );";
 
@@ -405,7 +428,7 @@ namespace Proyecto_Inmobiliaria.Models
                                 WHERE r.id_inmueble = inm.id
                                     AND r.anulada = 0
                                     AND r.fecha_desde <= @hasta
-                                    AND r.fecha_hasta >= @desde
+                                    AND COALESCE(r.fecha_terminacion, r.fecha_hasta) >= @desde
                             );";
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
@@ -441,6 +464,42 @@ namespace Proyecto_Inmobiliaria.Models
             return inmuebles;
         }
 
+        public int TerminarAnticipadamente(int idReserva, DateTime fechaTerminacion, int idUsuarioTerminador)
+        {
+            int res = -1; 
+
+            using (MySqlConnection connection = new MySqlConnection(connectionString)) {
+                
+                string sql = @"UPDATE reserva
+                            SET fecha_terminacion = @fecha_terminacion,
+                                id_usuario_terminador = @id_usuario_terminador
+                            WHERE id = @id
+                                AND anulada = 0
+                                AND fecha_terminacion IS NULL
+                                AND @fecha_terminacion >= fecha_desde
+                                AND @fecha_terminacion < fecha_hasta;";
+
+                using (MySqlCommand cmd = new MySqlCommand(sql, connection))
+                {
+                    cmd.CommandType = CommandType.Text;
+
+                    cmd.Parameters.AddWithValue("@id", idReserva);
+                    cmd.Parameters.AddWithValue(
+                        "@fecha_terminacion",
+                        fechaTerminacion.Date);
+
+                    cmd.Parameters.AddWithValue(
+                        "@id_usuario_terminador",
+                        idUsuarioTerminador);
+
+                    connection.Open();
+
+                    res = cmd.ExecuteNonQuery();
+                }
+            }
+
+            return res;
+        }
         private static Reserva LeerReserva(MySqlDataReader reader)
         {
             return new Reserva

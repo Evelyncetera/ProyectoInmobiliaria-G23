@@ -11,7 +11,7 @@ namespace Proyecto_Inmobiliaria.Models
 
         [Required(ErrorMessage = "La seña es obligatoria")]
         [Display(Name = "Seña")]
-        public string Concepto { get; set; }
+        public string Concepto { get; set; } = "";
 
         [Required(ErrorMessage = "La fecha de pago es importante")]
         [DataType(DataType.Date)]

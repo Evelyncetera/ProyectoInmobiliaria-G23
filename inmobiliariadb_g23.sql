@@ -80,6 +80,8 @@ CREATE TABLE IF NOT EXISTS `reserva` (
     `fecha_creacion` DATETIME NULL,
     `id_usuario_anulador` INT NULL,
     `fecha_anulacion` DATETIME NULL,
+    `fecha_terminacion` DATE NULL,
+    `id_usuario_terminador` INT NULL,
 
     CONSTRAINT `fk_reserva_inquilino`
         FOREIGN KEY (`id_inquilino`)
@@ -101,7 +103,11 @@ CREATE TABLE IF NOT EXISTS `reserva` (
         CHECK (`fecha_hasta` >= `fecha_desde`),
 
     CONSTRAINT `chk_reserva_monto`
-        CHECK (`monto_por_dia` > 0)
+        CHECK (`monto_por_dia` > 0),
+
+    CONSTRAINT `fk_reserva_usuario_terminador`
+      FOREIGN KEY (`id_usuario_terminador`)
+      REFERENCES `usuario` (`idUsuario`)
 ) ENGINE=InnoDB;
 
 /* ---- Seeders ---- */ 
@@ -255,7 +261,7 @@ INSERT INTO usuario
     (nombre, apellido, email, clave, rol, estado)
 VALUES
     ('Administrador', 'Sistema', 'admin@inmobiliaria.com',
-     'AQAAAAIAAYagAAAAEAzN+oct2QSGQ+GPzy4VTjkrhtLtXQ7oxfClpwMNx5fc6yT7km9qMq3jVBE+NaUH3Q==', 'Administrador', TRUE)
+    'AQAAAAIAAYagAAAAEAzN+oct2QSGQ+GPzy4VTjkrhtLtXQ7oxfClpwMNx5fc6yT7km9qMq3jVBE+NaUH3Q==', 'Administrador', TRUE)
 ON DUPLICATE KEY UPDATE
     rol = 'Administrador',
     estado = TRUE;
@@ -265,8 +271,8 @@ INSERT INTO usuario
     (nombre, apellido, email, clave, rol, estado)
 VALUES
     ('Empleado', 'Prueba', 'empleado@inmobiliaria.com',
-     'AQAAAAIAAYagAAAAEAzN+oct2QSGQ+GPzy4VTjkrhtLtXQ7oxfClpwMNx5fc6yT7km9qMq3jVBE+NaUH3Q==',
-     'Empleado', TRUE)
+      'AQAAAAIAAYagAAAAEAzN+oct2QSGQ+GPzy4VTjkrhtLtXQ7oxfClpwMNx5fc6yT7km9qMq3jVBE+NaUH3Q==',
+      'Empleado', TRUE)
 ON DUPLICATE KEY UPDATE
     rol = 'Empleado',
     estado = TRUE;

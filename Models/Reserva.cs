@@ -34,6 +34,13 @@ namespace Proyecto_Inmobiliaria.Models
         [Display(Name = "Anulada")]
         public bool Anulada { get; set; } = false;
 
+        [DataType(DataType.Date)]
+        [Display(Name = "Fecha de terminación")]
+        public DateTime? FechaTerminacion { get; set; }
+
+
+        public int? IdUsuarioTerminador { get; set; }
+        public string? NombreUsuarioTerminador { get; set; }
         public int? IdUsuarioCreador { get; set; }
         public string? NombreUsuarioCreador { get; set; }
         public DateTime FechaCreacion { get; set; }
