@@ -36,7 +36,7 @@
 
                 <!-- Botones de Acción -->
                 <div class="d-flex justify-content-center gap-2">
-                    <a asp-controller="Reservas" asp-action="Detalles" asp-route-id="@ViewBag.IdReserva" class="btn btn-secondary">
+                    <a asp-controller="Reservas" asp-action="Detalles" asp-route-id="@Model.IdReserva" class="btn btn-secondary">
                         <i class="bi bi-arrow-left"></i> Volver a la reserva
                     </a>
                     <button type="submit" class="btn btn-success">

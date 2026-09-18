@@ -88,6 +88,7 @@ SET @actualizar_inmueble = IF(
 PREPARE actualizar_inmueble FROM @actualizar_inmueble;
 EXECUTE actualizar_inmueble;
 DEALLOCATE PREPARE actualizar_inmueble;
+
 /* ---- Fin compatibilidad de inmuebles ---- */
 
 CREATE TABLE IF NOT EXISTS inmueble_imagen (

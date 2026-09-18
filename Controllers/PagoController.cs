@@ -35,8 +35,14 @@ namespace Proyecto_Inmobiliaria.Controllers
                     return NotFound();
                 }
 
-                ViewBag.IdReserva = reserva.IdReserva;
-                return View();
+                var pago = new Pago
+                {
+                    IdReserva = reserva.IdReserva,
+                    FechaPago = DateTime.Today,
+                    Anulada = false
+                };
+
+                return View(pago);
             }
             catch (MySqlException ex)
             {

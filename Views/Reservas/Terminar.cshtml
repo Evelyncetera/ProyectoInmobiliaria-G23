@@ -59,9 +59,12 @@
                 </div>
             }
 
+            <!-- FORMULARIO 1: CALCULAR PENALIZACIÓN -->
             <form asp-action="CalcularTerminacion" method="post">
 
-                <input type="hidden" name="idReserva" value="@Model.IdReserva" />
+                <input type="hidden"
+                        name="idReserva"
+                        value="@Model.IdReserva" />
 
                 <div class="mb-3">
 
@@ -69,10 +72,14 @@
                         Fecha efectiva de terminación
                     </label>
 
-                    <input type="date" id="fechaTerminacion" name="fechaTerminacion" class="form-control"
-                        value="@Model.FechaTerminacion?.ToString("yyyy-MM-dd")"
-                        min="@DateTime.Today.ToString("yyyy-MM-dd")"
-                        max="@Model.FechaHasta.AddDays(-1).ToString("yyyy-MM-dd")" required />
+                    <input type="date"
+                            id="fechaTerminacion"
+                            name="fechaTerminacion"
+                            class="form-control"
+                            value="@Model.FechaTerminacion?.ToString("yyyy-MM-dd")"
+                            min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                            max="@Model.FechaHasta.AddDays(-1).ToString("yyyy-MM-dd")"
+                            required />
                 </div>
 
                 @if (ViewBag.Penalizacion != null)
@@ -81,17 +88,26 @@
                         <h5>Detalle de la penalización</h5>
 
                         <dl class="row mb-0">
+
                             <dt class="col-md-6">Duración original</dt>
-                            <dd class="col-md-6">@ViewBag.DiasTotales días</dd>
+                            <dd class="col-md-6">
+                                @ViewBag.DiasTotales días
+                            </dd>
 
                             <dt class="col-md-6">Días cumplidos</dt>
-                            <dd class="col-md-6">@ViewBag.DiasCumplidos días</dd>
+                            <dd class="col-md-6">
+                                @ViewBag.DiasCumplidos días
+                            </dd>
 
                             <dt class="col-md-6">Días restantes</dt>
-                            <dd class="col-md-6">@ViewBag.DiasRestantes días</dd>
+                            <dd class="col-md-6">
+                                @ViewBag.DiasRestantes días
+                            </dd>
 
                             <dt class="col-md-6">Porcentaje aplicado</dt>
-                            <dd class="col-md-6">@ViewBag.PorcentajeAplicado%</dd>
+                            <dd class="col-md-6">
+                                @ViewBag.PorcentajeAplicado%
+                            </dd>
 
                             <dt class="col-md-6">Penalización</dt>
                             <dd class="col-md-6">
@@ -99,6 +115,7 @@
                                     @(((decimal)ViewBag.Penalizacion).ToString("C"))
                                 </strong>
                             </dd>
+
                         </dl>
                     </div>
                 }
@@ -107,12 +124,52 @@
                     Calcular penalización
                 </button>
 
-                <a asp-action="Detalles" asp-route-id="@Model.IdReserva" class="btn btn-secondary">
+                <a asp-action="Detalles"
+                    asp-route-id="@Model.IdReserva"
+                    class="btn btn-secondary">
                     <i class="bi bi-arrow-left"></i>
                     Volver
                 </a>
 
             </form>
+
+
+            <!-- FORMULARIO 2: CONFIRMAR PAGO Y TERMINACIÓN -->
+            @if (ViewBag.Penalizacion != null)
+            {
+                <hr />
+
+                <form asp-action="ConfirmarTerminacion" method="post">
+
+                    <input type="hidden"
+                            name="idReserva"
+                            value="@Model.IdReserva" />
+
+                    <input type="hidden"
+                            name="fechaTerminacion"
+                            value="@Model.FechaTerminacion?.ToString("yyyy-MM-dd")" />
+
+                    <div class="alert alert-danger mt-3">
+
+                        <strong>Confirmación:</strong>
+
+                        Para finalizar anticipadamente la reserva
+                        se registrará el pago de la penalización por
+
+                        <strong>
+                            @(((decimal)ViewBag.Penalizacion).ToString("C"))
+                        </strong>.
+
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-danger">
+                        <i class="bi bi-cash-coin"></i>
+                        Confirmar pago y terminar reserva
+                    </button>
+
+                </form>
+            }
 
         </div>
     </div>

@@ -32,36 +32,43 @@
                 <dd class="col-md-8">@Model.MontoPorDia.ToString("C")</dd>
                 <dt class="col-md-4">Estado</dt>
                 <dd class="col-md-8">
+
                     @if (Model.Anulada)
                     {
-                        <span class="badge bg-secondary"><i class="bi bi-x-circle-fill"></i> 
+                        <span class="badge bg-secondary">
+                            <i class="bi bi-x-circle-fill"></i>
                             Anulada
                         </span>
                     }
-                    else if (vigente)
+                    else if (Model.FechaTerminacion.HasValue)
                     {
-                        <span class="badge bg-danger"><i class="bi bi-x-octagon-fill"></i>
+                        <span class="badge bg-danger">
+                            <i class="bi bi-x-octagon-fill"></i>
                             Terminada anticipadamente
                         </span>
                     }
                     else if (vigente)
                     {
-                        <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> 
+                        <span class="badge bg-success">
+                            <i class="bi bi-check-circle-fill"></i>
                             Vigente
                         </span>
                     }
-                    else if (Model.FechaHasta < DateTime.Today)
+                    else if (Model.FechaHasta.Date < DateTime.Today)
                     {
-                        <span class="badge bg-dark"><i class="bi bi-clock-history"></i> 
+                        <span class="badge bg-dark">
+                            <i class="bi bi-clock-history"></i>
                             Vencida
                         </span>
                     }
                     else
                     {
-                        <span class="badge bg-info text-dark"><i class="bi bi-calendar-event-fill"></i> 
+                        <span class="badge bg-info text-dark">
+                            <i class="bi bi-calendar-event-fill"></i>
                             Programada
                         </span>
                     }
+
                 </dd>
             </dl>
 

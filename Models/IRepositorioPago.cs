@@ -9,4 +9,5 @@ public interface IRepositorioPago
     IList<Pago> ObtenerTodos();
     Pago? ObtenerPorId(int id);
 
+    int RegistrarPenalizacionYTerminarReserva(Pago pago, DateTime fechaTerminacion, int idUsuario);
 }

@@ -13,17 +13,20 @@ namespace Proyecto_Inmobiliaria.Controllers
         private readonly IRepositorioReserva _repositorioReserva;
         private readonly IRepositorioInquilino _repositorioInquilino;
         private readonly IRepositorioInmueble _repositorioInmueble;
+        private readonly IRepositorioPago _repositorioPago;
         private readonly ILogger<ReservasController> _logger;
 
 
         public ReservasController(IRepositorioReserva repositorio,
                                     IRepositorioInquilino repositorioInquilino,
                                     IRepositorioInmueble repositorioInmueble,
+                                    IRepositorioPago repositorioPago,
                                     ILogger<ReservasController> logger)
         {
             _repositorioReserva = repositorio;
             _repositorioInquilino = repositorioInquilino;
             _repositorioInmueble = repositorioInmueble;
+            _repositorioPago = repositorioPago;
             _logger = logger;
         }
 
@@ -601,6 +604,90 @@ namespace Proyecto_Inmobiliaria.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ConfirmarTerminacion(int idReserva, DateTime fechaTerminacion)
+        {
+            try
+            {
+                var reserva =_repositorioReserva.ObtenerPorId(idReserva);
+
+                if (reserva == null)
+                {
+                    return NotFound();
+                }
+
+                if (reserva.Anulada)
+                {
+                    TempData["Error"] = "No se puede terminar una reserva anulada.";
+
+                    return RedirectToAction(nameof(Detalles), new { id = idReserva });
+                }
+
+                if (reserva.FechaTerminacion.HasValue)
+                {
+                    TempData["Error"] ="La reserva ya fue terminada anticipadamente.";
+
+                    return RedirectToAction(nameof(Detalles), new { id = idReserva });
+                }
+
+                if (fechaTerminacion.Date < DateTime.Today ||
+                    fechaTerminacion.Date < reserva.FechaDesde.Date ||
+                    fechaTerminacion.Date >= reserva.FechaHasta.Date)
+                {
+                    TempData["Error"] ="La fecha de terminación no es válida.";
+
+                    return RedirectToAction(nameof(Terminar),new { id = idReserva });
+                }
+
+                // IMPORTANTE:
+                // La penalización vuelve a calcularse en el servidor.
+                decimal penalizacion = CalcularPenalizacion(reserva, fechaTerminacion);
+
+                var pago = new Pago
+                {
+                    IdReserva = reserva.IdReserva,
+                    Concepto = "Penalización por terminación anticipada",
+                    FechaPago = DateTime.Today,
+                    Importe = penalizacion,
+                    Anulada = false
+                };
+
+                int idUsuario = ObtenerIdUsuarioActual();
+
+                _repositorioPago.RegistrarPenalizacionYTerminarReserva(pago, fechaTerminacion, idUsuario);
+
+                TempData["Mensaje"] ="La penalización fue registrada y la reserva terminó anticipadamente.";
+
+                return RedirectToAction(
+                    nameof(Detalles),
+                    new { id = idReserva });
+            }
+            catch (MySqlException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Error de base de datos al finalizar anticipadamente la reserva {IdReserva}",
+                    idReserva);
+
+                TempData["Error"] ="Ocurrió un error de base de datos al finalizar la reserva.";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Error al finalizar anticipadamente la reserva {IdReserva}",
+                    idReserva);
+
+                TempData["Error"] =
+                    "No se pudo completar la terminación anticipada.";
+            }
+
+            return RedirectToAction(
+                nameof(Terminar),
+                new { id = idReserva });
         }
 
         // POST: /Reservas/CalcularTerminacion

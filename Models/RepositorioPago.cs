@@ -25,7 +25,7 @@ namespace Proyecto_Inmobiliaria.Models
                     cmd.Parameters.AddWithValue("@id_reserva", p.IdReserva);
                     cmd.Parameters.AddWithValue("@concepto", p.Concepto);
                     cmd.Parameters.AddWithValue("@importe", p.Importe);
-                    cmd.Parameters.AddWithValue("@anulado", p.Anulada);
+                    cmd.Parameters.AddWithValue("@anulada", p.Anulada);
                     cmd.Parameters.AddWithValue("@id_usuario_creador", idUsuarioCreador);
 
                     connection.Open();
@@ -50,10 +50,10 @@ namespace Proyecto_Inmobiliaria.Models
             {
 
                 string sql = @"UPDATE pago
-                             SET anulada = 1,
-                                id_usuario_anulador = @id_usuario_anulador,
-                                fecha_anulacion = CURRENT_TIMESTAMP
-                             WHERE id = @id AND anulada = 0";
+                                SET anulada = 1,
+                                    id_usuario_anulador = @id_usuario_anulador,
+                                    fecha_anulacion = CURRENT_TIMESTAMP
+                                WHERE id = @id AND anulada = 0";
 
                 using (MySqlCommand cmd = new MySqlCommand(sql, connection))
                 {
@@ -171,6 +171,76 @@ namespace Proyecto_Inmobiliaria.Models
             return p;
         }
 
+        public int RegistrarPenalizacionYTerminarReserva(Pago pago,DateTime fechaTerminacion,
+            int idUsuario)
+        {
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+            using MySqlTransaction transaction = connection.BeginTransaction();
+
+            try
+            {
+                string sqlPago = @"INSERT INTO pago
+                                    (id_reserva, concepto, fecha_pago, importe,
+                                    anulada, id_usuario_creador, fecha_creacion)
+                                VALUES
+                                    (@id_reserva, @concepto, @fecha_pago,
+                                    @importe, 0, @id_usuario_creador,
+                                    CURRENT_TIMESTAMP);";
+
+                using MySqlCommand cmdPago = new MySqlCommand(sqlPago, connection, transaction);
+
+                cmdPago.Parameters.AddWithValue("@id_reserva", pago.IdReserva);
+
+                cmdPago.Parameters.AddWithValue("@concepto", pago.Concepto);
+
+                cmdPago.Parameters.AddWithValue("@fecha_pago", pago.FechaPago.Date);
+
+                cmdPago.Parameters.AddWithValue("@importe", pago.Importe);
+
+                cmdPago.Parameters.AddWithValue("@id_usuario_creador", idUsuario);
+
+                cmdPago.ExecuteNonQuery();
+
+                int idPago = (int)cmdPago.LastInsertedId;
+
+                string sqlReserva = @"UPDATE reserva
+                                    SET fecha_terminacion = @fecha_terminacion,
+                                        id_usuario_terminador = @id_usuario_terminador
+                                    WHERE id = @id_reserva
+                                        AND anulada = 0
+                                        AND fecha_terminacion IS NULL
+                                        AND @fecha_terminacion >= fecha_desde
+                                        AND @fecha_terminacion < fecha_hasta;";
+
+                using MySqlCommand cmdReserva =
+                    new MySqlCommand(sqlReserva, connection, transaction);
+
+                cmdReserva.Parameters.AddWithValue("@fecha_terminacion", fechaTerminacion.Date);
+
+                cmdReserva.Parameters.AddWithValue("@id_usuario_terminador", idUsuario);
+
+                cmdReserva.Parameters.AddWithValue("@id_reserva", pago.IdReserva);
+
+                int filasReserva = cmdReserva.ExecuteNonQuery();
+
+                if (filasReserva != 1)
+                {
+                    throw new InvalidOperationException("La reserva no pudo terminarse anticipadamente.");
+                }
+
+                transaction.Commit();
+
+                pago.IdPago = idPago;
+
+                return idPago;
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
         private static Pago LeerPagos(MySqlDataReader reader)
         {
             return new Pago
@@ -183,6 +253,7 @@ namespace Proyecto_Inmobiliaria.Models
                 Anulada = reader.GetBoolean("anulada"),
             };
         }
+
 
     }
 
