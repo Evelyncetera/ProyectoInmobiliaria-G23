@@ -133,8 +133,8 @@ namespace Proyecto_Inmobiliaria.Models
                                 CONCAT(uc.nombre, ' ', uc.apellido) AS nombre_usuario_creador,
                                 CONCAT(ua.nombre, ' ', ua.apellido) AS nombre_usuario_anulador
                              FROM pago p
-                             LEFT JOIN usuario uc ON uc.idUsuario = r.id_usuario_creador
-                             LEFT JOIN usuario ua ON ua.idUsuario = r.id_usuario_anulador
+                             LEFT JOIN usuario uc ON uc.idUsuario = p.id_usuario_creador
+                             LEFT JOIN usuario ua ON ua.idUsuario = p.id_usuario_anulador
                              WHERE p.id = @id;";
                 using (MySqlCommand cmd = new MySqlCommand(sql, connection))
                 {
@@ -171,7 +171,59 @@ namespace Proyecto_Inmobiliaria.Models
             return p;
         }
 
-        public int RegistrarPenalizacionYTerminarReserva(Pago pago,DateTime fechaTerminacion,
+        public IList<Pago> ObtenerPorReserva(int idReserva)
+        {
+            IList<Pago> pagos = new List<Pago>();
+
+            string sql = @"SELECT p.id, p.id_reserva, p.concepto, p.fecha_pago,
+                            p.importe, p.anulada,
+                            p.id_usuario_creador, p.fecha_creacion,
+                            p.id_usuario_anulador, p.fecha_anulacion,
+                            CONCAT(uc.nombre, ' ', uc.apellido) AS nombre_usuario_creador,
+                            CONCAT(ua.nombre, ' ', ua.apellido) AS nombre_usuario_anulador
+                        FROM pago p
+                        LEFT JOIN usuario uc ON uc.idUsuario = p.id_usuario_creador
+                        LEFT JOIN usuario ua ON ua.idUsuario = p.id_usuario_anulador
+                        WHERE p.id_reserva = @id_reserva
+                        ORDER BY p.fecha_pago DESC;";
+
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                using (MySqlCommand cmd = new MySqlCommand(sql, connection))
+                {
+                    cmd.CommandType = CommandType.Text;
+                    cmd.Parameters.AddWithValue("@id_reserva", idReserva);
+
+                    connection.Open();
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            pagos.Add(new Pago
+                            {
+                                IdPago = reader.GetInt32("id"),
+                                IdReserva = reader.GetInt32("id_reserva"),
+                                Concepto = reader.GetString("concepto"),
+                                FechaPago = reader.GetDateTime("fecha_pago"),
+                                Importe = reader.GetDecimal("importe"),
+                                Anulada = reader.GetBoolean("anulada"),
+                                IdUsuarioCreador = reader.IsDBNull(reader.GetOrdinal("id_usuario_creador"))
+                                    ? null : reader.GetInt32("id_usuario_creador"),
+                                NombreUsuarioCreador = reader.IsDBNull(reader.GetOrdinal("nombre_usuario_creador"))
+                                    ? null : reader.GetString("nombre_usuario_creador"),
+                                IdUsuarioAnulador = reader.IsDBNull(reader.GetOrdinal("id_usuario_anulador"))
+                                    ? null : reader.GetInt32("id_usuario_anulador"),
+                                NombreUsuarioAnulador = reader.IsDBNull(reader.GetOrdinal("nombre_usuario_anulador"))
+                                    ? null : reader.GetString("nombre_usuario_anulador"),
+                            });
+                        }
+                    }
+                    return pagos;
+                }
+            }
+        }
+
+        public int RegistrarPenalizacionYTerminarReserva(Pago pago, DateTime fechaTerminacion,
             int idUsuario)
         {
             using MySqlConnection connection = new MySqlConnection(connectionString);

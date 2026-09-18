@@ -30,7 +30,7 @@ namespace Proyecto_Inmobiliaria.Controllers
             _logger = logger;
         }
 
-    
+
         private void CargarSelectLists()
         {
             var inquilinos = _repositorioInquilino.ObtenerTodos();
@@ -73,7 +73,7 @@ namespace Proyecto_Inmobiliaria.Controllers
         {
             try
             {
-                
+
                 CargarSelectLists();
 
                 var reserva = new Reserva
@@ -207,8 +207,18 @@ namespace Proyecto_Inmobiliaria.Controllers
         {
             try
             {
+                //var reserva = _repositorioReserva.ObtenerPorId(id);
                 var reserva = _repositorioReserva.ObtenerPorId(id);
-                return reserva == null ? NotFound() : View(reserva);
+                if (reserva == null) return NotFound();
+
+                var vm = new ReservaDetalleViewModel
+                {
+                    Reserva = reserva,
+                    Pagos = _repositorioPago.ObtenerPorReserva(id)
+                };
+
+                return View(vm);
+                //return reserva == null ? NotFound() : View(reserva);
             }
             catch (MySqlException ex)
             {
@@ -317,8 +327,8 @@ namespace Proyecto_Inmobiliaria.Controllers
                 return View(reserva);
             }
         }
-            
-            
+
+
 
         // GET: /Reservas/Eliminar/5
         [Authorize(Roles = "Administrador")]
@@ -490,15 +500,16 @@ namespace Proyecto_Inmobiliaria.Controllers
         // POST: /Reservas/Extender
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Extender(Reserva reserva, int idReservaOriginal) {
-            
-            Reserva ? original = null;
+        public IActionResult Extender(Reserva reserva, int idReservaOriginal)
+        {
+
+            Reserva? original = null;
 
             try
             {
                 original = _repositorioReserva.ObtenerPorId(idReservaOriginal);
 
-                if(original == null)
+                if (original == null)
                 {
                     return NotFound();
                 }
@@ -516,36 +527,39 @@ namespace Proyecto_Inmobiliaria.Controllers
                 reserva.IdInquilino = original.IdInquilino;
                 reserva.IdInmueble = original.IdInmueble;
 
-                if (reserva.FechaHasta < reserva.FechaDesde){
+                if (reserva.FechaHasta < reserva.FechaDesde)
+                {
 
                     ModelState.AddModelError("FechaHasta", "La fecha de finalización no puede ser anterior a la fecha de inicio.");
                 }
-            
-                if (!ModelState.IsValid){
+
+                if (!ModelState.IsValid)
+                {
 
                     ViewBag.Original = original;
                     return View(reserva);
                 }
 
-                if (!_repositorioReserva.EstaDisponible(reserva.IdInmueble, reserva.FechaDesde, reserva.FechaHasta)){
-                    
+                if (!_repositorioReserva.EstaDisponible(reserva.IdInmueble, reserva.FechaDesde, reserva.FechaHasta))
+                {
+
                     ViewBag.Original = original;
                     ViewBag.Error = "El inmueble seleccionado ya está ocupado en esas fechas.";
-                    
+
                     return View(reserva);
                 }
 
                 _repositorioReserva.Alta(reserva, ObtenerIdUsuarioActual()); // Genera una nueva reserva (la original queda intacta)
-                
+
                 TempData["Mensaje"] = "Reserva renovada/extendida con éxito. Se generó un nuevo alquiler.";
                 return RedirectToAction(nameof(Index));
 
             }
-            catch (MySqlException ex) 
+            catch (MySqlException ex)
             {
                 _logger.LogError(ex, "Error de base de datos al renovar la reserva {idReserva}", idReservaOriginal);
                 ViewBag.Error = "Ocurrió un error de conexión a la base de datos";
-                
+
                 ViewBag.Original = original;
 
                 return View(reserva);
@@ -567,27 +581,32 @@ namespace Proyecto_Inmobiliaria.Controllers
             {
                 var reserva = _repositorioReserva.ObtenerPorId(id);
 
-                if (reserva == null) {
+                if (reserva == null)
+                {
                     return NotFound();
                 }
 
-                if (reserva.Anulada){
+                if (reserva.Anulada)
+                {
                     TempData["Error"] = "No se puede terminar una reserva anulada.";
                     return RedirectToAction(nameof(Detalles), new { id });
                 }
 
-                if (reserva.FechaTerminacion.HasValue){
+                if (reserva.FechaTerminacion.HasValue)
+                {
                     TempData["Error"] = "Esta reserva ya fue terminada anticipadamente.";
                     return RedirectToAction(nameof(Detalles), new { id });
                 }
 
-                if (DateTime.Today < reserva.FechaDesde.Date){
+                if (DateTime.Today < reserva.FechaDesde.Date)
+                {
                     TempData["Error"] = "La reserva todavía no comenzó. Si desea cancelarla, debe anularla.";
                     return RedirectToAction(nameof(Detalles), new { id });
                 }
 
-                if (DateTime.Today >= reserva.FechaHasta.Date){
-                    TempData["Error"] ="La reserva ya finalizó y no puede terminarse anticipadamente.";
+                if (DateTime.Today >= reserva.FechaHasta.Date)
+                {
+                    TempData["Error"] = "La reserva ya finalizó y no puede terminarse anticipadamente.";
                     return RedirectToAction(nameof(Detalles), new { id });
                 }
 
@@ -612,7 +631,7 @@ namespace Proyecto_Inmobiliaria.Controllers
         {
             try
             {
-                var reserva =_repositorioReserva.ObtenerPorId(idReserva);
+                var reserva = _repositorioReserva.ObtenerPorId(idReserva);
 
                 if (reserva == null)
                 {
@@ -628,7 +647,7 @@ namespace Proyecto_Inmobiliaria.Controllers
 
                 if (reserva.FechaTerminacion.HasValue)
                 {
-                    TempData["Error"] ="La reserva ya fue terminada anticipadamente.";
+                    TempData["Error"] = "La reserva ya fue terminada anticipadamente.";
 
                     return RedirectToAction(nameof(Detalles), new { id = idReserva });
                 }
@@ -637,9 +656,9 @@ namespace Proyecto_Inmobiliaria.Controllers
                     fechaTerminacion.Date < reserva.FechaDesde.Date ||
                     fechaTerminacion.Date >= reserva.FechaHasta.Date)
                 {
-                    TempData["Error"] ="La fecha de terminación no es válida.";
+                    TempData["Error"] = "La fecha de terminación no es válida.";
 
-                    return RedirectToAction(nameof(Terminar),new { id = idReserva });
+                    return RedirectToAction(nameof(Terminar), new { id = idReserva });
                 }
 
                 // IMPORTANTE:
@@ -659,7 +678,7 @@ namespace Proyecto_Inmobiliaria.Controllers
 
                 _repositorioPago.RegistrarPenalizacionYTerminarReserva(pago, fechaTerminacion, idUsuario);
 
-                TempData["Mensaje"] ="La penalización fue registrada y la reserva terminó anticipadamente.";
+                TempData["Mensaje"] = "La penalización fue registrada y la reserva terminó anticipadamente.";
 
                 return RedirectToAction(
                     nameof(Detalles),
@@ -672,7 +691,7 @@ namespace Proyecto_Inmobiliaria.Controllers
                     "Error de base de datos al finalizar anticipadamente la reserva {IdReserva}",
                     idReserva);
 
-                TempData["Error"] ="Ocurrió un error de base de datos al finalizar la reserva.";
+                TempData["Error"] = "Ocurrió un error de base de datos al finalizar la reserva.";
             }
             catch (Exception ex)
             {
@@ -699,36 +718,42 @@ namespace Proyecto_Inmobiliaria.Controllers
             {
                 var reserva = _repositorioReserva.ObtenerPorId(idReserva);
 
-                if (reserva == null) {
+                if (reserva == null)
+                {
                     return NotFound();
                 }
 
-                if (reserva.Anulada){
+                if (reserva.Anulada)
+                {
                     TempData["Error"] = "No se puede terminar una reserva anulada.";
                     return RedirectToAction(nameof(Detalles), new { id = idReserva });
                 }
 
-                if (reserva.FechaTerminacion.HasValue) {
+                if (reserva.FechaTerminacion.HasValue)
+                {
                     TempData["Error"] = "La reserva ya fue terminada anticipadamente.";
                     return RedirectToAction(nameof(Detalles), new { id = idReserva });
                 }
 
-                if (fechaTerminacion.Date < DateTime.Today) {
+                if (fechaTerminacion.Date < DateTime.Today)
+                {
                     ViewBag.Error = "La fecha de terminación no puede ser anterior a la fecha actual.";
 
                     reserva.FechaTerminacion = DateTime.Today;
                     return View("Terminar", reserva);
                 }
 
-                if (fechaTerminacion.Date < reserva.FechaDesde.Date){
+                if (fechaTerminacion.Date < reserva.FechaDesde.Date)
+                {
                     ViewBag.Error = "La fecha de terminación no puede ser anterior al inicio de la reserva.";
 
                     reserva.FechaTerminacion = fechaTerminacion;
                     return View("Terminar", reserva);
                 }
 
-                if (fechaTerminacion.Date >= reserva.FechaHasta.Date){
-                    ViewBag.Error ="La fecha de terminación debe ser anterior a la fecha de finalización original.";
+                if (fechaTerminacion.Date >= reserva.FechaHasta.Date)
+                {
+                    ViewBag.Error = "La fecha de terminación debe ser anterior a la fecha de finalización original.";
 
                     reserva.FechaTerminacion = fechaTerminacion;
                     return View("Terminar", reserva);
@@ -737,7 +762,7 @@ namespace Proyecto_Inmobiliaria.Controllers
                 decimal penalizacion = CalcularPenalizacion(reserva, fechaTerminacion);
 
                 int diasTotales = (reserva.FechaHasta.Date - reserva.FechaDesde.Date).Days + 1;
-                int diasCumplidos =(fechaTerminacion.Date - reserva.FechaDesde.Date).Days + 1;
+                int diasCumplidos = (fechaTerminacion.Date - reserva.FechaDesde.Date).Days + 1;
                 int diasRestantes = (reserva.FechaHasta.Date - fechaTerminacion.Date).Days;
                 decimal mitadPeriodo = diasTotales / 2m;
                 int porcentajeAplicado = diasCumplidos < mitadPeriodo ? 50 : 25;
@@ -927,8 +952,9 @@ namespace Proyecto_Inmobiliaria.Controllers
             }
         }
 
-        private decimal CalcularPenalizacion(Reserva reserva, DateTime fechaTerminacion) {
-            
+        private decimal CalcularPenalizacion(Reserva reserva, DateTime fechaTerminacion)
+        {
+
             int diasTotales = (reserva.FechaHasta.Date - reserva.FechaDesde.Date).Days + 1;
 
             int diasCumplidos = (fechaTerminacion.Date - reserva.FechaDesde.Date).Days + 1;
@@ -941,7 +967,7 @@ namespace Proyecto_Inmobiliaria.Controllers
 
             decimal alquilerRestante = diasRestantes * reserva.MontoPorDia;
 
-            return Math.Round( alquilerRestante * porcentajePenalizacion, 2);
+            return Math.Round(alquilerRestante * porcentajePenalizacion, 2);
         }
 
         private int ObtenerIdUsuarioActual()

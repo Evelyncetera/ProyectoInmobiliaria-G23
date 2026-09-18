@@ -87,6 +87,115 @@ namespace Proyecto_Inmobiliaria.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult Editar(int id)
+        {
+            Pago pago = null;
+            try
+            {
+                pago = _repositorio.ObtenerPorId(id);
+                if (pago == null)
+                {
+                    return NotFound();
+                }
+                return View(pago);
+            }
+            catch (MySqlException ex)
+            {
+                _logger.LogError(ex, "Error de base de datos al buscar el pago {IdPago}", id);
+                TempData["Error"] = "Ocurrió un error de conexión a la base de datos";
+                return RedirectToAction("Detalles", "Reservas", new { id = pago.IdReserva});
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error inesperado al buscar el pago {IdPago}", id);
+                TempData["Error"] = "Error al buscar el pago";
+                return RedirectToAction("Detalles", "Reservas", new { id = pago.IdReserva});
+            }
+        }
+
+        [HttpPost]
+        public IActionResult Editar(int id, Pago pago)
+        {
+            if (id != pago.IdPago)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                _repositorio.Modificacion(pago);
+                TempData["Mensaje"] = "Pago modificado con éxito.";
+                return RedirectToAction("Detalles", "Reservas", new {id = pago.IdReserva});
+            }
+            catch (MySqlException ex)
+            {
+                _logger.LogError(ex, "Error de base de datos al modificar el pago {IdPago}", id);
+                ViewBag.Error = "Ocurrió un error de conexión a la base de datos";
+                return View(pago);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error inesperado al modificar el pago {IdPago}", id);
+                ViewBag.Error = "Ocurrió un error al modificar el pago";
+                return View(pago);
+            }
+        }
+
+        // GET: /Pago/Eliminar/5
+        [Authorize(Roles = "Administrador")]
+        [HttpGet]
+        public IActionResult Eliminar(int id)
+        {
+            Pago pago = null;
+            try
+            {
+                pago = _repositorio.ObtenerPorId(id);
+                if (pago == null)
+                {
+                    return NotFound();
+                }
+                return View(pago); // Retorna vista de confirmación
+            }
+            catch (MySqlException ex)
+            {
+                _logger.LogError(ex, "Error de base de datos al buscar el pago {IdPago} para anularla", id);
+                TempData["Error"] = "Ocurrió un error de conexión a la base de datos";
+                return RedirectToAction("Detalles", "Reservas", new { id = pago.IdReserva });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error inesperado al buscar el pago {IdPago} para anularla", id);
+                TempData["Error"] = "Error al buscar la reserva";
+                return RedirectToAction("Detalles", "Reservas", new { id = pago.IdReserva });
+            }
+        }
+
+        // POST: /Pago/Eliminar/5 (Baja lógica: anula el pago)
+        [Authorize(Roles = "Administrador")]
+        [HttpPost, ActionName("Eliminar")]
+        [ValidateAntiForgeryToken]
+        public IActionResult EliminarConfirmado(int id)
+        {
+            var pago = _repositorio.ObtenerPorId(id);
+            try
+            {
+                _repositorio.Baja(id, ObtenerIdUsuarioActual());
+                TempData["Mensaje"] = "Pago anulado correctamente.";
+            }
+            catch (MySqlException ex)
+            {
+                _logger.LogError(ex, "Error de base de datos al anular el pago {IdPago}", id);
+                TempData["Error"] = "Ocurrió un error de conexión a la base de datos";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error inesperado al anular el pago {IdPago}", id);
+                TempData["Error"] = "No se pudo anular el pago";
+            }
+            return RedirectToAction("Detalles", "Reservas", new {id = pago.IdReserva});
+        }
+
         private int ObtenerIdUsuarioActual()
         {
             var claim = User.FindFirstValue(ClaimTypes.NameIdentifier);
