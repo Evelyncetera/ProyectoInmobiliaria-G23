@@ -566,7 +566,6 @@ WHERE i.dni = '33333333'
         AND r.anulada = TRUE
   );
 
-
 /* usuario - admin de prueba*/
 
 INSERT INTO usuario
@@ -588,3 +587,27 @@ VALUES
 ON DUPLICATE KEY UPDATE
     rol = 'Empleado',
     estado = TRUE;
+
+
+INSERT INTO `pago`
+    (`id_reserva`, `concepto`, `fecha_pago`, `importe`, `anulada`,
+     `id_usuario_creador`, `fecha_creacion`, `id_usuario_anulador`, `fecha_anulacion`)
+VALUES
+-- Reserva 1 (Vigente) - Av. España 1250 - seña 30% de 1.275.000
+(1, 'Seña 30%',                  '2026-09-08', 382500.00, FALSE, 1, '2026-09-08 10:15:00', NULL, NULL),
+(1, 'Pago parcial check-in',     '2026-09-13', 500000.00, FALSE, 2, '2026-09-13 09:40:00', NULL, NULL),
+
+-- Reserva 2 (Vencida) - San Martín 450 - seña 25% de 1.950.000, pagada al 100%
+(2, 'Seña 25%',                  '2026-07-15', 487500.00, FALSE, 1, '2026-07-15 11:00:00', NULL, NULL),
+(2, 'Pago check-in',             '2026-07-20', 731250.00, FALSE, 2, '2026-07-20 10:30:00', NULL, NULL),
+(2, 'Saldo final',               '2026-08-19', 731250.00, FALSE, 2, '2026-08-19 12:00:00', NULL, NULL),
+
+-- Reserva 3 (Programada) - San Martín 450 - seña 25% de 2.040.000
+(3, 'Seña 25%',                  '2026-09-15', 510000.00, FALSE, 1, '2026-09-15 16:20:00', NULL, NULL),
+
+-- Reserva 4 (Vigente) - Junín 780 - seña 20% de 990.000
+(4, 'Seña 20%',                  '2026-09-12', 198000.00, FALSE, 1, '2026-09-12 14:10:00', NULL, NULL),
+(4, 'Pago check-in',             '2026-09-16', 300000.00, FALSE, 2, '2026-09-16 09:55:00', NULL, NULL),
+
+-- Reserva 5 (Anulada) - Rivadavia 920 - seña 30% de 825.000, anulada con la reserva
+(5, 'Seña 30%',                  '2026-09-05', 247500.00, TRUE,  1, '2026-09-05 15:00:00', 1, '2026-09-09 10:00:00');
