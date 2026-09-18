@@ -233,6 +233,154 @@ namespace Proyecto_Inmobiliaria.Controllers
             return RedirectToAction(nameof(Perfil));
         }
 
+        // GET: /Usuarios/Administrar
+        [Authorize(Roles = "Administrador")]
+        [HttpGet]
+        public IActionResult Administrar()
+        {
+            var usuarios = _repoUsuario.ObtenerTodosIncluyendoInactivos();
+            return View(usuarios);
+        }
+
+        // GET: /Usuarios/CrearUsuario
+        [Authorize(Roles = "Administrador")]
+        [HttpGet]
+        public IActionResult CrearUsuario()
+        {
+            return View(new Usuario { Rol = "Empleado", Estado = 1 });
+        }
+
+        // POST: /Usuarios/CrearUsuario
+        [Authorize(Roles = "Administrador")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CrearUsuario(Usuario usuario)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(usuario);
+            }
+
+            if (usuario.Rol != "Administrador" && usuario.Rol != "Empleado")
+            {
+                ModelState.AddModelError(nameof(usuario.Rol), "El rol debe ser Administrador o Empleado.");
+                return View(usuario);
+            }
+
+            usuario.Estado = 1;
+            usuario.Clave = _passwordHasher.HashPassword(usuario, usuario.Clave);
+
+            try
+            {
+                _repoUsuario.Alta(usuario);
+                TempData["Mensaje"] = "Usuario creado correctamente.";
+                return RedirectToAction(nameof(Administrar));
+            }
+            catch (MySqlConnector.MySqlException ex) when (ex.Number == 1062)
+            {
+                ModelState.AddModelError(nameof(usuario.Email), "El correo electrónico ya está registrado.");
+                return View(usuario);
+            }
+        }
+
+        // GET: /Usuarios/EditarUsuario
+        [Authorize(Roles = "Administrador")]
+        [HttpGet]
+        public IActionResult EditarUsuario(int id)
+        {
+            var usuario = _repoUsuario.ObtenerPorId(id);
+            if (usuario == null)
+            {
+                return NotFound();
+            }
+
+            var modelo = new EditarUsuarioViewModel
+            {
+                IdUsuario = usuario.IdUsuario,
+                Nombre = usuario.Nombre,
+                Apellido = usuario.Apellido,
+                Email = usuario.Email,
+                Rol = usuario.Rol
+            };
+
+            return View(modelo);
+        }
+
+        // POST: /Usuarios/EditarUsuario
+        [Authorize(Roles = "Administrador")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditarUsuario(EditarUsuarioViewModel modelo)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(modelo);
+            }
+
+            if (modelo.Rol != "Administrador" && modelo.Rol != "Empleado")
+            {
+                ModelState.AddModelError(nameof(modelo.Rol), "El rol debe ser Administrador o Empleado.");
+                return View(modelo);
+            }
+
+            var usuarioOriginal = _repoUsuario.ObtenerPorId(modelo.IdUsuario);
+            if (usuarioOriginal == null)
+            {
+                return NotFound();
+            }
+
+            var claim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(claim, out var idUsuarioActual)
+                && modelo.IdUsuario == idUsuarioActual
+                && usuarioOriginal.Rol == "Administrador"
+                && modelo.Rol == "Empleado")
+            {
+                TempData["Error"] = "No puede quitarse a sí mismo el rol de Administrador.";
+                return RedirectToAction(nameof(Administrar));
+            }
+
+            usuarioOriginal.Nombre = modelo.Nombre;
+            usuarioOriginal.Apellido = modelo.Apellido;
+            usuarioOriginal.Rol = modelo.Rol;
+
+            _repoUsuario.Modificacion(usuarioOriginal);
+
+            TempData["Mensaje"] = "Usuario modificado correctamente.";
+            return RedirectToAction(nameof(Administrar));
+        }
+
+        // POST: /Usuarios/CambiarEstado
+        [Authorize(Roles = "Administrador")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CambiarEstado(int id, int estado)
+        {
+            if (estado != 0 && estado != 1)
+            {
+                return BadRequest();
+            }
+
+            var usuario = _repoUsuario.ObtenerPorId(id);
+            if (usuario == null)
+            {
+                return NotFound();
+            }
+
+            var claim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(claim, out var idUsuarioActual) && id == idUsuarioActual && estado == 0)
+            {
+                TempData["Error"] = "No puede desactivar su propio usuario.";
+                return RedirectToAction(nameof(Administrar));
+            }
+
+            _repoUsuario.CambiarEstado(id, estado);
+
+            TempData["Mensaje"] = estado == 1
+                ? "Usuario activado correctamente."
+                : "Usuario desactivado correctamente.";
+            return RedirectToAction(nameof(Administrar));
+        }
+
         // POST: /Usuarios/Logout
         [Authorize]
         [HttpPost]

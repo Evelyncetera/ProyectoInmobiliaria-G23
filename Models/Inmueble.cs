@@ -10,10 +10,12 @@ namespace Proyecto_Inmobiliaria.Models
         
         [Required(ErrorMessage = "El propietario es obligatorio.")]
         [Display(Name = "Propietario")]
+        [Range(1, int.MaxValue, ErrorMessage = "Seleccioná un propietario.")]
         public int IdPropietario { get; set; }
 
         [Required(ErrorMessage = "El tipo de inmueble es obligatorio.")]
         [Display(Name = "Tipo de Inmueble")]
+        [Range(1, int.MaxValue, ErrorMessage = "Seleccioná un tipo de inmueble.")]
         public int IdTipoInmueble { get; set;}
 
         [Required(ErrorMessage = "La dirección es obligatoria.")]
@@ -44,6 +46,11 @@ namespace Proyecto_Inmobiliaria.Models
 
         [Display(Name = "Disponible")]
         public bool Disponible { get; set; } = true;
+
+        public bool Estado { get; set; } = true;
+        public string NombrePropietario { get; set; } = "";
+        public string NombreTipo { get; set; } = "";
+        public int? IdPortada { get; set; }
 
         public override string ToString()
         {

@@ -14,8 +14,8 @@ namespace Proyecto_Inmobiliaria.Models
             using (var connection = new MySqlConnection(connectionString))
             {
                 string sql = @"INSERT INTO usuario (nombre, apellido, email, clave, avatarUrl, rol, estado) 
-                               VALUES (@nombre, @apellido, @email, @clave, @avatarUrl, @rol, @estado);
-                               SELECT LAST_INSERT_ID();";
+                                VALUES (@nombre, @apellido, @email, @clave, @avatarUrl, @rol, @estado);
+                                SELECT LAST_INSERT_ID();";
 
                 using (var command = new MySqlCommand(sql, connection))
                 {
@@ -201,7 +201,46 @@ namespace Proyecto_Inmobiliaria.Models
             }
         }
 
-        
+        public IList<Usuario> ObtenerTodosIncluyendoInactivos()
+        {
+            var res = new List<Usuario>();
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                string sql = @"SELECT idUsuario, nombre, apellido, email, clave, avatarUrl, rol, estado 
+                               FROM usuario ORDER BY apellido, nombre;";
+
+                using (var command = new MySqlCommand(sql, connection))
+                {
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            res.Add(MapearUsuario(reader));
+                        }
+                    }
+                }
+            }
+            return res;
+        }
+
+        public int CambiarEstado(int id, int estado)
+        {
+            int res = -1;
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                string sql = @"UPDATE usuario SET estado = @estado WHERE idUsuario = @id;";
+                using (var command = new MySqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@id", id);
+                    command.Parameters.AddWithValue("@estado", estado);
+                    connection.Open();
+                    res = command.ExecuteNonQuery();
+                }
+            }
+            return res;
+        }
+
         private static Usuario MapearUsuario(MySqlDataReader reader)
         {
             return new Usuario

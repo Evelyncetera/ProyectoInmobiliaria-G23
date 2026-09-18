@@ -35,9 +35,9 @@
                         <i class="bi bi-exclamation-triangle-fill"></i> @ViewBag.Error
                     </div>
                 }
-
+                <!--
                 <div class="row">
-                    <!-- Inquilino -->
+                     // Inquilino 
                     <div class="col-md-6 mb-3">
                         <label asp-for="IdInquilino" class="form-label font-weight-bold">Inquilino</label>
                         <select asp-for="IdInquilino" class="form-select" asp-items="ViewBag.Inquilinos">
@@ -46,13 +46,34 @@
                         <span asp-validation-for="IdInquilino" class="text-danger"></span>
                     </div>
 
-                    <!-- Inmueble -->
+                    // Inmueble
                     <div class="col-md-6 mb-3">
                         <label asp-for="IdInmueble" class="form-label font-weight-bold">Inmueble</label>
                         <select asp-for="IdInmueble" class="form-select" asp-items="ViewBag.Inmuebles">
                             <option value="">-- Seleccione un inmueble --</option>
                         </select>
                         <span asp-validation-for="IdInmueble" class="text-danger"></span>
+                    </div>
+                </div> -->
+
+                <input type="hidden" name="idReservaOriginal" value="@original?.IdReserva" />
+
+                <input asp-for="IdInquilino" type="hidden" />
+                <input asp-for="IdInmueble" type="hidden" />
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Inquilino</label>
+                        <input class="form-control"
+                            value="@($"{original?.NombreInquilino} {original?.ApellidoInquilino}")"
+                            readonly />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Inmueble</label>
+                        <input class="form-control"
+                            value="@original?.DireccionInmueble"
+                            readonly />
                     </div>
                 </div>
 

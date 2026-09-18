@@ -1,19 +1,20 @@
-namespace Proyecto_Inmobiliaria.Models;
-
-    
-public interface IRepositorioInmueble
+namespace Proyecto_Inmobiliaria.Models
 {
-    int Alta(Inmueble i); //Prioridad
-    int Baja(int id); //Prioridad
-    int Modificacion(Inmueble i); //Prioridad
-    IList<Inmueble> ObtenerTodos();
-    Inmueble? ObtenerPorId(int id);
-
-    /* ----- Informes que se van a necesitar más adelante ------
-● Listar todos los inmuebles y su dueño, que estén en el sistema. Permitir filtrar por disponibilidad (no de fechas, sino de la propiedad “Estado” o “Disponible”).
-● Listar todos los inmuebles que le correspondan a un propietario específico.
-● Listar los inmuebles más reservados en los últimos 365 días.
-● Listar los inmuebles sin reservas en los últimos X días (30, 60, etc.).
-    
-    */
+    public interface IRepositorioInmueble
+    {
+        int Alta(Inmueble i);
+        int Baja(int id);
+        int Modificacion(Inmueble i);
+        IList<Inmueble> ObtenerTodos();
+        Inmueble? ObtenerPorId(int id);
+        InmueblesListadoViewModel ObtenerPagina(InmueblesListadoViewModel filtro);
+        int Guardar(Inmueble inmueble, IReadOnlyList<string> imagenes, bool nuevo);
+        bool CambiarDisponibilidad(int id, bool disponible);
+        IList<OpcionInmueble> BuscarPropietarios(string? buscar, int? seleccionado = null);
+        IList<OpcionInmueble> BuscarTipos(string? buscar, int? seleccionado = null);
+        IList<ImagenInmueble> ObtenerImagenes(int idInmueble);
+        string? ObtenerImagenBase64(int id);
+        bool CambiarPortada(int idInmueble, int idImagen);
+        bool BajaImagen(int idInmueble, int idImagen);
+    }
 }

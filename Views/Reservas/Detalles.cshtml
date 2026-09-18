@@ -1,7 +1,14 @@
-@model Reserva
+@model ReservaDetalleViewModel
 
 @{
-    var vigente = !Model.Anulada && Model.FechaDesde <= DateTime.Today && Model.FechaHasta >= DateTime.Today;
+    var vigente =  !Model.Reserva.Anulada && !Model.Reserva.FechaTerminacion.HasValue &&
+                        Model.Reserva.FechaDesde.Date <= DateTime.Today && Model.Reserva.FechaHasta.Date >= DateTime.Today;
+
+    var puedeEditar =
+        !Model.Reserva.Anulada &&
+        !Model.Reserva.FechaTerminacion.HasValue &&
+        Model.Reserva.FechaHasta.Date >= DateTime.Today;
+
 }
 
 <div class="container mt-4">
@@ -12,37 +19,191 @@
         <div class="card-body">
             <dl class="row mb-4">
                 <dt class="col-md-4">Código interno</dt>
-                <dd class="col-md-8">@Model.IdReserva</dd>
+                <dd class="col-md-8">@Model.Reserva.IdReserva</dd>
                 <dt class="col-md-4">Inquilino</dt>
-                <dd class="col-md-8">@Model.NombreInquilino @Model.ApellidoInquilino (@Model.DniInquilino)</dd>
+                <dd class="col-md-8">@Model.Reserva.NombreInquilino @Model.Reserva.ApellidoInquilino (@Model.Reserva.DniInquilino)</dd>
                 <dt class="col-md-4">Inmueble</dt>
-                <dd class="col-md-8">@Model.DireccionInmueble</dd>
+                <dd class="col-md-8">@Model.Reserva.DireccionInmueble</dd>
                 <dt class="col-md-4">Fecha de inicio</dt>
-                <dd class="col-md-8">@Model.FechaDesde.ToString("dd/MM/yyyy")</dd>
+                <dd class="col-md-8">@Model.Reserva.FechaDesde.ToString("dd/MM/yyyy")</dd>
                 <dt class="col-md-4">Fecha de finalización</dt>
-                <dd class="col-md-8">@Model.FechaHasta.ToString("dd/MM/yyyy")</dd>
+                <dd class="col-md-8">@Model.Reserva.FechaHasta.ToString("dd/MM/yyyy")</dd>
                 <dt class="col-md-4">Monto por día</dt>
-                <dd class="col-md-8">@Model.MontoPorDia.ToString("C")</dd>
+                <dd class="col-md-8">@Model.Reserva.MontoPorDia.ToString("C")</dd>
                 <dt class="col-md-4">Estado</dt>
                 <dd class="col-md-8">
-                    @if (Model.Anulada)
+
+                    @if (Model.Reserva.Anulada)
                     {
-                        <span class="badge bg-secondary"><i class="bi bi-x-circle-fill"></i> Anulada</span>
+                        <span class="badge bg-secondary">
+                            <i class="bi bi-x-circle-fill"></i>
+                            Anulada
+                        </span>
+                    }
+                    else if (Model.Reserva.FechaTerminacion.HasValue)
+                    {
+                        <span class="badge bg-danger">
+                            <i class="bi bi-x-octagon-fill"></i>
+                            Terminada anticipadamente
+                        </span>
                     }
                     else if (vigente)
                     {
-                        <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Vigente</span>
+                        <span class="badge bg-success">
+                            <i class="bi bi-check-circle-fill"></i>
+                            Vigente
+                        </span>
                     }
-                    else if (Model.FechaHasta < DateTime.Today)
+                    else if (Model.Reserva.FechaHasta.Date < DateTime.Today)
                     {
-                        <span class="badge bg-dark"><i class="bi bi-clock-history"></i> Vencida</span>
+                        <span class="badge bg-dark">
+                            <i class="bi bi-clock-history"></i>
+                            Vencida
+                        </span>
                     }
                     else
                     {
-                        <span class="badge bg-info text-dark"><i class="bi bi-calendar-event-fill"></i> Programada</span>
+                        <span class="badge bg-info text-dark">
+                            <i class="bi bi-calendar-event-fill"></i>
+                            Programada
+                        </span>
                     }
+
                 </dd>
             </dl>
+
+            <div class="card shadow-sm mb-5">
+                <div class="card-header bg-success text-center text-white">
+                    <h2 class="mb-0">Listado de Pagos</h2>
+                </div>
+                
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped mb-0 align-middle">
+                            <colgroup>
+                                <col style="width: 10%;" />
+                                <col style="width: 10%;" />
+                                <col style="width: 10%;" />
+                                <col style="width: 10%;" />
+                                @if (User.IsInRole("Administrador")){
+                                    <col style="width: 15%;" />
+                                    <col style="width: 15%;" />
+                                }
+                                <col style="width: 20%;" />
+                            </colgroup>
+                            <thead class="table-dark">
+                                <tr>
+                                    <th class="text-center">Concepto</th>
+                                    <th class="text-center">Fecha de Pago</th>
+                                    <th class="text-center">Importe</th>
+                                    <th class="text-center">Estado</th>
+                                    @if (User.IsInRole("Administrador"))
+                                    {                                   
+                                        <th class="text-center">Creada por</th>
+                                        <th class="text-center">Anulada por</th>
+                                    }
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                        <tbody>
+                            @if (Model.Pagos.Any())
+                            {
+                                foreach (var pago in Model.Pagos)
+                                {
+                                    <tr class="text-center">
+                                        <td class="fw-bold">@pago.Concepto</td>
+                                        <td>@pago.FechaPago.ToShortDateString()</td>
+                                        <td class="text-break">@pago.Importe.ToString("C")</td>
+                                        @if(!pago.Anulada){
+                                            <td class="fw-bold text-success"> Vigente </td>                                       
+                                        }
+                                        else
+                                        {
+                                            <td class="fw-bold text-danger"> Pago anulado </td>                                                                                
+                                        }
+                                        @if (User.IsInRole("Administrador"))
+                                        {     
+                                            <td>@(pago.NombreUsuarioCreador ?? "Sin información")</td>
+                                            <td>@(pago.NombreUsuarioAnulador ?? "No anulada")</td>
+                                        }
+                                        <td class="d-flex justify-content-center">
+                                            @if(User.IsInRole("Administrador"))
+                                            {
+                                                <div class="row row-cols-2" role="group">
+                                                    @if(!pago.Anulada)
+                                                    {
+                                                        <div class="col">
+                                                            <button type="button" class="btn btn-warning btn-sm w-100">
+                                                                <a asp-controller="Pago" asp-action="Editar" asp-route-id="@pago.IdPago" class="text-reset text-decoration-none">
+                                                                    <i class="bi bi-pencil-fill"></i> Editar
+                                                                </a>
+                                                            </button>
+                                                        </div>
+                                                                                                                                              
+                                                        <div class="col ">  
+                                                            <form asp-controller="Pago" asp-action="Eliminar" asp-route-id="@pago.IdPago" method="post" class="w-100" onsubmit="return confirm('¿Anular el pago @pago.IdPago de la reserva @Model.Reserva.IdReserva de @Model.Reserva.NombreInquilino @Model.Reserva.ApellidoInquilino? Esta acción no se puede deshacer.');">
+                                                                <button type="submit" class="btn btn-danger btn-sm text-wrap w-100"><i class="bi bi-trash-fill"></i> Anular Pago </button>
+                                                            </form>                                           
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="col">
+                                                            <button type="button" class="btn btn-warning btn-sm w-100" disabled>
+                                                                <a asp-controller="Pago" asp-action="Editar" asp-route-id="@pago.IdPago" class="text-reset text-decoration-none">
+                                                                    <i class="bi bi-pencil-fill"></i> Editar
+                                                                </a>
+                                                            </button>
+                                                        </div>
+                                                                                                                                              
+                                                        <div class="col ">  
+                                                            <form asp-controller="Pago" asp-action="Eliminar" asp-route-id="@pago.IdPago" method="post" class="w-100" onsubmit="return confirm('¿Anular el pago @pago.IdPago de la reserva @Model.Reserva.IdReserva de @Model.Reserva.NombreInquilino @Model.Reserva.ApellidoInquilino? Esta acción no se puede deshacer.');">
+                                                                <button type="submit" class="btn btn-danger btn-sm text-wrap w-100" disabled><i class="bi bi-trash-fill"></i> Anular Pago </button>
+                                                            </form>                                           
+                                                        </div>
+                                                    }                                                    
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="row row-cols-1" role="group">
+                                                    @if(!pago.Anulada)
+                                                    {                                                   
+                                                        <div class="col">
+                                                            <button type="button" class="btn btn-warning btn-sm w-100">
+                                                                <a asp-controller="Pago" asp-action="Editar" asp-route-id="@pago.IdPago" class="text-reset text-decoration-none">
+                                                                    <i class="bi bi-pencil-fill"></i> Editar
+                                                                </a>
+                                                            </button>
+                                                        </div>                                                                                                                                             
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="col">
+                                                            <button type="button" class="btn btn-warning btn-sm w-100" disabled>
+                                                                <a asp-controller="Pago" asp-action="Editar" asp-route-id="@pago.IdPago" class="text-reset text-decoration-none">
+                                                                    <i class="bi bi-pencil-fill"></i> Editar
+                                                                </a>
+                                                            </button>
+                                                        </div> 
+                                                    }
+                                                </div>    
+                                            }                                                                         
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <div class="d-flex justify-content-center m-4">
+                                    <tr><td colspan="6" class="text-center">No hay pagos registrados</td></tr>
+                                </div>
+                            }
+                        </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
             @if (User.IsInRole("Administrador"))
             {
@@ -51,18 +212,29 @@
                 <dl class="row">
                     <dt class="col-md-4">Creada por</dt>
                     <dd class="col-md-8">
-                        @(Model.NombreUsuarioCreador ?? "Sin información")
-                        @if (Model.FechaCreacion != default)
+                        @(Model.Reserva.NombreUsuarioCreador ?? "Sin información")
+                        @if (Model.Reserva.FechaCreacion != default)
                         {
-                            <span>(@Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm"))</span>
+                            <span>(@Model.Reserva.FechaCreacion.ToString("dd/MM/yyyy HH:mm"))</span>
                         }
                     </dd>
                     <dt class="col-md-4">Anulada por</dt>
                     <dd class="col-md-8">
-                        @(Model.NombreUsuarioAnulador ?? "No anulada")
-                        @if (Model.FechaAnulacion.HasValue)
+                        @(Model.Reserva.NombreUsuarioAnulador ?? "No anulada")
+                        @if (Model.Reserva.FechaAnulacion.HasValue)
                         {
-                            <span>(@Model.FechaAnulacion.Value.ToString("dd/MM/yyyy HH:mm"))</span>
+                            <span>(@Model.Reserva.FechaAnulacion.Value.ToString("dd/MM/yyyy HH:mm"))</span>
+                        }
+                    </dd>
+                    <dt class="col-md-4">Terminada por</dt>
+                    <dd class="col-md-8">
+                        @(Model.Reserva.NombreUsuarioTerminador ?? "No terminada anticipadamente")
+
+                        @if (Model.Reserva.FechaTerminacion.HasValue)
+                        {
+                            <span>
+                                (@Model.Reserva.FechaTerminacion.Value.ToString("dd/MM/yyyy"))
+                            </span>
                         }
                     </dd>
                 </dl>
@@ -70,8 +242,36 @@
             <div class="d-flex justify-content-between">
                 <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Volver</a>
                 <div>
-                    <a asp-action="Extender" asp-route-id="@Model.IdReserva" class="btn btn-primary"><i class="bi bi-arrow-repeat"></i> Renovar/Extender</a>
-                    <a asp-action="Editar" asp-route-id="@Model.IdReserva" class="btn btn-warning text-dark"><i class="bi bi-pencil-fill"></i> Editar</a>
+                    <a asp-controller="Pago"
+                        asp-action="Crear"
+                        asp-route-id="@Model.Reserva.IdReserva"
+                        class="btn btn-success">
+                            <i class="bi bi-cash"></i> Generar Nuevo Pago
+                        </a>
+
+                        <a asp-action="Extender"
+                        asp-route-id="@Model.Reserva.IdReserva"
+                        class="btn btn-primary">
+                            <i class="bi bi-arrow-repeat"></i> Renovar/Extender
+                        </a>
+
+                        @if (vigente && !Model.Reserva.FechaTerminacion.HasValue)
+                        {
+                            <a asp-action="Terminar"
+                            asp-route-id="@Model.Reserva.IdReserva"
+                            class="btn btn-danger">
+                                <i class="bi bi-x-octagon"></i> Terminar anticipadamente
+                            </a>
+                        }
+
+                        @if (puedeEditar)
+                        {
+                            <a asp-action="Editar"
+                            asp-route-id="@Model.Reserva.IdReserva"
+                            class="btn btn-warning text-dark">
+                                <i class="bi bi-pencil-fill"></i> Editar
+                            </a>
+                        }
                 </div>
             </div>
         </div>

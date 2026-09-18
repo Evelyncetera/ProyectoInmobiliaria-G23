@@ -1,0 +1,65 @@
+@model InmuebleDetallesViewModel
+@{ var inmueble = Model.Inmueble; ViewData["Title"] = inmueble.Direccion; }
+<h1 class="mt-4">@inmueble.Direccion</h1>
+<p class="text-muted">@inmueble.NombreTipo · @inmueble.NombrePropietario</p>
+<div class="card card-body mb-4">
+    <dl class="row mb-0">
+        <dt class="col-sm-4">Código</dt><dd class="col-sm-8">@inmueble.IdInmueble</dd>
+        <dt class="col-sm-4">Cupo</dt><dd class="col-sm-8">@inmueble.Cupo personas</dd>
+        <dt class="col-sm-4">Precio por día</dt><dd class="col-sm-8">@inmueble.PrecioPorDia.ToString("C")</dd>
+        <dt class="col-sm-4">Porcentaje de reserva</dt><dd class="col-sm-8">@inmueble.PorcentajeReserva%</dd>
+        <dt class="col-sm-4">Coordenadas</dt><dd class="col-sm-8">@inmueble.Latitud, @inmueble.Longitud</dd>
+        <dt class="col-sm-4">Estado</dt><dd class="col-sm-8">@(!inmueble.Estado ? "Dado de baja" : inmueble.Disponible ? "Disponible" : "Oferta suspendida")</dd>
+    </dl>
+</div>
+<div class="d-flex flex-wrap gap-2 mb-4">
+    <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
+    @if (inmueble.Estado)
+    {
+        <a asp-action="Editar" asp-route-id="@inmueble.IdInmueble" class="btn btn-primary">Editar / agregar imágenes</a>
+        <form asp-action="Disponibilidad" asp-route-id="@inmueble.IdInmueble" method="post">
+            <input type="hidden" name="disponible" value="@((!inmueble.Disponible).ToString().ToLowerInvariant())" />
+            <button type="submit" class="btn btn-outline-warning">@(inmueble.Disponible ? "Suspender oferta" : "Reactivar oferta")</button>
+        </form>
+        @if (User.IsInRole("Administrador"))
+        {
+            <form asp-action="Eliminar" asp-route-id="@inmueble.IdInmueble" method="post" onsubmit="return confirm('¿Dar de baja el inmueble? Se conservarán sus reservas e imágenes.');">
+                <button class="btn btn-outline-danger" type="submit">Dar de baja</button>
+            </form>
+        }
+    }
+</div>
+<h2>Imágenes (@Model.Imagenes.Count / 12)</h2>
+@if (Model.Imagenes.Count == 0) { <p class="text-muted">Este inmueble todavía no tiene imágenes.</p> }
+<div class="row g-3">
+@foreach (var imagen in Model.Imagenes)
+{
+    <div class="@(imagen.EsPortada ? "col-12" : "col-md-4")">
+        <div class="card h-100">
+            <a href="@Url.Action("Imagen", new { id = imagen.Id })" target="_blank" rel="noopener">
+                <img src="@Url.Action("Imagen", new { id = imagen.Id })" alt="@(imagen.EsPortada ? "Portada" : "Imagen") de @inmueble.Direccion" class="card-img-top" style="max-height:420px;object-fit:contain" loading="lazy" />
+            </a>
+            <div class="card-body d-flex gap-2 align-items-center">
+                @if (imagen.EsPortada) { <span class="badge bg-primary">Portada</span> }
+                @if (inmueble.Estado)
+                {
+                    @if (!imagen.EsPortada)
+                    {
+                        <form asp-action="Portada" asp-route-id="@inmueble.IdInmueble" method="post">
+                            <input type="hidden" name="imagenId" value="@imagen.Id" />
+                            <button type="submit" class="btn btn-sm btn-outline-primary">Usar como portada</button>
+                        </form>
+                    }
+                    @if (User.IsInRole("Administrador"))
+                    {
+                        <form asp-action="EliminarImagen" asp-route-id="@inmueble.IdInmueble" method="post" onsubmit="return confirm('¿Quitar esta imagen de la galería?');">
+                            <input type="hidden" name="imagenId" value="@imagen.Id" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Quitar imagen</button>
+                        </form>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+}
+</div>

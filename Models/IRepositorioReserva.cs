@@ -10,8 +10,9 @@ namespace Proyecto_Inmobiliaria.Models
         IList<Reserva> ObtenerTodos();
         Reserva? ObtenerPorId(int id);
 
-   
         bool EstaDisponible(int idInmueble, DateTime desde, DateTime hasta, int? exceptoId = null);
+
+        int TerminarAnticipadamente(int idReserva, DateTime fechaTerminacion, int idUsuarioTerminador);
 
         /* ----- Informes ----- */
         IList<Reserva> ObtenerVigentes(); 
