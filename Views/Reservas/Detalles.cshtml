@@ -2,7 +2,7 @@
 
 @{
     var vigente =  !Model.Anulada && !Model.FechaTerminacion.HasValue &&
-                        Model.FechaDesde <= DateTime.Today && Model.FechaHasta >= DateTime.Today;
+                        Model.FechaDesde.Date <= DateTime.Today && Model.FechaHasta.Date >= DateTime.Today;
 
     var puedeEditar =
         !Model.Anulada &&
@@ -38,7 +38,7 @@
                             Anulada
                         </span>
                     }
-                    else if (Model.FechaTerminacion.HasValue)
+                    else if (vigente)
                     {
                         <span class="badge bg-danger"><i class="bi bi-x-octagon-fill"></i>
                             Terminada anticipadamente
@@ -64,6 +64,7 @@
                     }
                 </dd>
             </dl>
+
 
             @if (User.IsInRole("Administrador"))
             {
@@ -102,25 +103,36 @@
             <div class="d-flex justify-content-between">
                 <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Volver</a>
                 <div>
-                    <a  asp-action="Extender" 
-                        asp-route-id="@Model.IdReserva" 
-                        class="btn btn-primary">
-                        <i class="bi bi-arrow-repeat"></i> Renovar/Extender
-                    </a>
-                    @if (vigente && !Model.FechaTerminacion.HasValue)
-                    {
-                        <a asp-action="Terminar"
+                    <a asp-controller="Pago"
+                        asp-action="Crear"
                         asp-route-id="@Model.IdReserva"
-                        class="btn btn-danger">
-                            <i class="bi bi-x-octagon"></i> Terminar anticipadamente
+                        class="btn btn-success">
+                            <i class="bi bi-cash"></i> Generar Nuevo Pago
                         </a>
-                    }
-                    <a  asp-action="Editar" 
-                        asp-route-id="@Model.IdReserva" 
-                        class="btn btn-warning text-dark">
-                        <i class="bi bi-pencil-fill"></i> Editar
-                    </a>
 
+                        <a asp-action="Extender"
+                        asp-route-id="@Model.IdReserva"
+                        class="btn btn-primary">
+                            <i class="bi bi-arrow-repeat"></i> Renovar/Extender
+                        </a>
+
+                        @if (vigente && !Model.FechaTerminacion.HasValue)
+                        {
+                            <a asp-action="Terminar"
+                            asp-route-id="@Model.IdReserva"
+                            class="btn btn-danger">
+                                <i class="bi bi-x-octagon"></i> Terminar anticipadamente
+                            </a>
+                        }
+
+                        @if (puedeEditar)
+                        {
+                            <a asp-action="Editar"
+                            asp-route-id="@Model.IdReserva"
+                            class="btn btn-warning text-dark">
+                                <i class="bi bi-pencil-fill"></i> Editar
+                            </a>
+                        }
                 </div>
             </div>
         </div>
