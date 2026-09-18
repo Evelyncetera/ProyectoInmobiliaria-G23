@@ -1,0 +1,11 @@
+@model Inmueble
+@{ ViewData["Title"] = "Registrar inmueble"; }
+<h1 class="mt-4">Registrar inmueble</h1>
+<form asp-action="Crear" method="post" enctype="multipart/form-data" class="card card-body">
+    <partial name="_Formulario" model="Model" />
+    <div class="d-flex justify-content-between mt-4">
+        <a asp-action="Index" class="btn btn-secondary">Volver</a>
+        <button class="btn btn-primary" type="submit">Registrar inmueble</button>
+    </div>
+</form>
+<script src="~/js/inmuebles.js" asp-append-version="true" defer></script>

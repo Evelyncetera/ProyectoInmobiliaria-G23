@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="MySqlConnector" Version="2.6.2" />
+    <PackageReference Include="SkiaSharp" Version="3.119.4" />
    
   </ItemGroup>
 

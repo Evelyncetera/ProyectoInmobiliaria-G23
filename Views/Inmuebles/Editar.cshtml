@@ -1,0 +1,12 @@
+@model Inmueble
+@{ ViewData["Title"] = "Editar inmueble"; }
+<h1 class="mt-4">Editar inmueble</h1>
+<p><a asp-action="Detalles" asp-route-id="@Model.IdInmueble">Ver galería y elegir portada</a></p>
+<form asp-action="Editar" asp-route-id="@Model.IdInmueble" method="post" enctype="multipart/form-data" class="card card-body">
+    <partial name="_Formulario" model="Model" />
+    <div class="d-flex justify-content-between mt-4">
+        <a asp-action="Detalles" asp-route-id="@Model.IdInmueble" class="btn btn-secondary">Cancelar</a>
+        <button class="btn btn-primary" type="submit">Guardar cambios</button>
+    </div>
+</form>
+<script src="~/js/inmuebles.js" asp-append-version="true" defer></script>
