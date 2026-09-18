@@ -10,8 +10,8 @@ namespace Proyecto_Inmobiliaria.Models
 
         private const string Seleccion = """
             SELECT i.*, CONCAT(p.apellido, ', ', p.nombre) AS propietario, t.nombre AS tipo,
-              (SELECT im.id FROM inmueble_imagen im
-               WHERE im.id_inmueble = i.id AND im.estado = 1 AND im.es_portada = 1 LIMIT 1) AS portada
+                (SELECT im.id FROM inmueble_imagen im
+                WHERE im.id_inmueble = i.id AND im.estado = 1 AND im.es_portada = 1 LIMIT 1) AS portada
             FROM inmueble i
             INNER JOIN propietario p ON p.id = i.id_propietario
             INNER JOIN tipo_inmueble t ON t.id = i.id_tipo_inmueble
@@ -56,10 +56,10 @@ namespace Proyecto_Inmobiliaria.Models
             filtro.Estado = filtro.Estado is "todos" or "bajas" ? filtro.Estado : "activos";
             filtro.Buscar = filtro.Buscar?.Trim();
             const string where = """
-                 WHERE (@buscar = '' OR i.direccion LIKE @patron OR CONCAT(p.nombre, ' ', p.apellido) LIKE @patron)
-                 AND (@propietario IS NULL OR i.id_propietario = @propietario)
-                 AND (@disponible IS NULL OR i.disponible = @disponible)
-                 AND (@estado IS NULL OR i.estado = @estado)
+                    WHERE (@buscar = '' OR i.direccion LIKE @patron OR CONCAT(p.nombre, ' ', p.apellido) LIKE @patron)
+                    AND (@propietario IS NULL OR i.id_propietario = @propietario)
+                    AND (@disponible IS NULL OR i.disponible = @disponible)
+                    AND (@estado IS NULL OR i.estado = @estado)
                 """;
             using var cn = new MySqlConnection(connectionString);
             cn.Open();
