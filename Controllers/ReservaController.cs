@@ -134,7 +134,29 @@ namespace Proyecto_Inmobiliaria.Controllers
                     return View(reserva);
                 }
 
-                _repositorioReserva.Alta(reserva, ObtenerIdUsuarioActual());
+                int idReserva = _repositorioReserva.Alta(reserva, ObtenerIdUsuarioActual());
+
+                var inmueble = _repositorioInmueble.ObtenerPorId(reserva.IdInmueble);
+                if (inmueble != null && inmueble.PorcentajeReserva > 0)
+                {
+                    int diasTotales = (reserva.FechaHasta.Date - reserva.FechaDesde.Date).Days + 1;
+                    decimal totalReserva = reserva.MontoPorDia * diasTotales;
+                    decimal importeSenia = Math.Round(totalReserva * (inmueble.PorcentajeReserva / 100m), 2);
+
+                    if (importeSenia > 0)
+                    {
+                        var senia = new Pago
+                        {
+                            IdReserva = idReserva,
+                            Concepto = "Seña",
+                            FechaPago = DateTime.Today,
+                            Importe = importeSenia,
+                            Anulada = false
+                        };
+                        _repositorioPago.Alta(senia, ObtenerIdUsuarioActual());
+                    }
+                }
+
                 TempData["Mensaje"] = "Reserva registrada con éxito.";
                 return RedirectToAction(nameof(Index));
             }
@@ -549,7 +571,28 @@ namespace Proyecto_Inmobiliaria.Controllers
                     return View(reserva);
                 }
 
-                _repositorioReserva.Alta(reserva, ObtenerIdUsuarioActual()); // Genera una nueva reserva (la original queda intacta)
+                int idReserva = _repositorioReserva.Alta(reserva, ObtenerIdUsuarioActual());
+
+                var inmueble = _repositorioInmueble.ObtenerPorId(reserva.IdInmueble);
+                if (inmueble != null && inmueble.PorcentajeReserva > 0)
+                {
+                    int diasTotales = (reserva.FechaHasta.Date - reserva.FechaDesde.Date).Days + 1;
+                    decimal totalReserva = reserva.MontoPorDia * diasTotales;
+                    decimal importeSenia = Math.Round(totalReserva * (inmueble.PorcentajeReserva / 100m), 2);
+
+                    if (importeSenia > 0)
+                    {
+                        var senia = new Pago
+                        {
+                            IdReserva = idReserva,
+                            Concepto = "Seña",
+                            FechaPago = DateTime.Today,
+                            Importe = importeSenia,
+                            Anulada = false
+                        };
+                        _repositorioPago.Alta(senia, ObtenerIdUsuarioActual());
+                    }
+                }
 
                 TempData["Mensaje"] = "Reserva renovada/extendida con éxito. Se generó un nuevo alquiler.";
                 return RedirectToAction(nameof(Index));
