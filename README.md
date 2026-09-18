@@ -54,6 +54,6 @@ A continuación se presenta el esquema del modelo de datos correspondiente a la 
 
 ### Diagrama Entidad-Relación (DER) / Diagrama de Clases
 
-![Diagrama del Proyecto](./diagram/diagrama%20de%20clases.png)
+![Diagrama del Proyecto](./diagram/DER%20inmobiliaria.png)
 
 
