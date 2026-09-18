@@ -4,7 +4,7 @@ Sistema web de gestión inmobiliaria desarrollado en **ASP.NET Core MVC (.NET 10
 
 El sistema permite gestionar propietarios, inquilinos, inmuebles, reservas, pagos y usuarios, incluyendo control de disponibilidad, renovaciones, terminaciones anticipadas, señas y autenticación basada en roles.
 
-> **Rama correspondiente a la versión final del proyecto:** `desarrollo`
+> **Rama correspondiente a la versión final del proyecto:** `master`
 
 ---
 
@@ -211,21 +211,21 @@ La estructura actual de la base de datos se encuentra definida en el script `inm
 
 Este archivo contiene las tablas, relaciones, claves primarias y claves foráneas utilizadas por la versión actual del sistema.
 
+![DER Inmobiliaria](./diagram/DER_inmobiliaria.png)
+
 ---
 
 ## 🌿 Rama de entrega
 
-La versión integrada y actualizada del proyecto se encuentra en la rama `desarrollo`.
-
 En caso de haber clonado el repositorio sin especificar una rama, puede cambiar a la versión final mediante:
 
-    git checkout desarrollo
+    git checkout master
     
 ---
 
 En caso de haber clonado el repositorio sin especificar una rama, puede cambiar a la versión final mediante:
 
 ```bash
-git checkout desarrollo
+git checkout master
 ```
 
