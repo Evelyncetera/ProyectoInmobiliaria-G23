@@ -207,21 +207,21 @@ Una vez iniciada la aplicación, la consola indicará la dirección local desde 
 
 ## 📐 Modelado de Datos
 
-A continuación se presenta el esquema del modelo de datos correspondiente a la aplicación.
+La estructura actual de la base de datos se encuentra definida en el script `inmobiliariadb_g23.sql`.
 
-### Diagrama Entidad-Relación (DER) / Diagrama de Clases
-
-![Diagrama del Proyecto](./diagram/DER%20inmobiliaria.png)
+Este archivo contiene las tablas, relaciones, claves primarias y claves foráneas utilizadas por la versión actual del sistema.
 
 ---
 
 ## 🌿 Rama de entrega
 
-La versión integrada y actualizada del proyecto se encuentra en la rama:
+La versión integrada y actualizada del proyecto se encuentra en la rama `desarrollo`.
 
-```text
-desarrollo
-```
+En caso de haber clonado el repositorio sin especificar una rama, puede cambiar a la versión final mediante:
+
+    git checkout desarrollo
+    
+---
 
 En caso de haber clonado el repositorio sin especificar una rama, puede cambiar a la versión final mediante:
 
