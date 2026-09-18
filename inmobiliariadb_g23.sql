@@ -2,7 +2,7 @@
 CREATE DATABASE IF NOT EXISTS `inmobiliariadb_g23` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish_ci;
 USE `inmobiliariadb_g23`;
 
-/*---- Tablas ----*/
+/* ######################### TABLAS #####################################*/
 CREATE TABLE IF NOT EXISTS `propietario` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `dni` VARCHAR(20) NOT NULL UNIQUE,
@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS `propietario` (
   `email` VARCHAR(100) NOT NULL
 ) ENGINE=InnoDB;
 
+    /*    Inquilino    */
 CREATE TABLE IF NOT EXISTS `inquilino` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `dni` VARCHAR(20) NOT NULL UNIQUE,
@@ -21,11 +22,13 @@ CREATE TABLE IF NOT EXISTS `inquilino` (
   `email` VARCHAR(100) NOT NULL
 ) ENGINE=InnoDB;
 
+    /*   Tipo Inmueble    */
 CREATE TABLE IF NOT EXISTS `tipo_inmueble` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `nombre` VARCHAR(100) NOT NULL UNIQUE
 ) ENGINE=InnoDB;
 
+    /*    Usuario    */
 CREATE TABLE IF NOT EXISTS `usuario` (
   `idUsuario` INT AUTO_INCREMENT PRIMARY KEY,
   `nombre` VARCHAR(50) NOT NULL,
@@ -37,6 +40,8 @@ CREATE TABLE IF NOT EXISTS `usuario` (
   `estado` BOOLEAN NOT NULL DEFAULT TRUE
 ) ENGINE=InnoDB;
 
+
+    /*    Inmueble    */
 CREATE TABLE IF NOT EXISTS `inmueble` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `id_propietario` INT NOT NULL,
@@ -68,6 +73,8 @@ CREATE TABLE IF NOT EXISTS `inmueble` (
               AND `porcentaje_reserva` <= 100)
 ) ENGINE=InnoDB;
 
+
+      /*    Reserva    */
 CREATE TABLE IF NOT EXISTS `reserva` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `id_inquilino` INT NOT NULL,
@@ -110,18 +117,53 @@ CREATE TABLE IF NOT EXISTS `reserva` (
       REFERENCES `usuario` (`idUsuario`)
 ) ENGINE=InnoDB;
 
-/* ---- Seeders ---- */ 
+    /*    Pago    */
+CREATE TABLE IF NOT EXISTS `pago` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `id_reserva` INT NOT NULL,
+    `concepto` VARCHAR(200) NOT NULL,
+    `fecha_pago` DATE NOT NULL,
+    `importe` DECIMAL(12,2) NOT NULL,
+    `anulada` BOOLEAN NOT NULL DEFAULT FALSE,
 
+    `id_usuario_creador` INT NULL,
+    `fecha_creacion` DATETIME NULL,
+
+    `id_usuario_anulador` INT NULL,
+    `fecha_anulacion` DATETIME NULL,
+
+    CONSTRAINT `fk_pago_reserva`
+        FOREIGN KEY (`id_reserva`)
+        REFERENCES `reserva` (`id`),
+
+    CONSTRAINT `fk_pago_usuario_creador`
+        FOREIGN KEY (`id_usuario_creador`)
+        REFERENCES `usuario` (`idUsuario`),
+
+    CONSTRAINT `fk_pago_usuario_anulador`
+        FOREIGN KEY (`id_usuario_anulador`)
+        REFERENCES `usuario` (`idUsuario`),
+
+    CONSTRAINT `chk_pago_importe`
+        CHECK (`importe` > 0)
+) ENGINE=InnoDB;
+
+
+/* ############################ Seeders ################################### */ 
+
+/*    Propietarios    */
 INSERT INTO `propietario` (`dni`, `nombre`, `apellido`, `telefono`, `email`) VALUES
 ('11111111', 'Juan Alberto', 'Perez', '2664000001', 'juan.perez@email.com'),
 ('22222222', 'Maria Angelica', 'Gomez', '2664000002', 'maria.gomez@email.com')
 ON DUPLICATE KEY UPDATE `dni`=`dni`;
 
+/*    Inquilinos    */
 INSERT INTO `inquilino` (`dni`, `nombre`, `apellido`, `telefono`, `email`) VALUES
 ('33333333', 'Carlos Eduardo', 'Lopez', '2664000003', 'carlos.lopez@email.com'),
 ('44444444', 'Ana Beatriz', 'Martinez', '2664000004', 'ana.martinez@email.com')
 ON DUPLICATE KEY UPDATE `dni`=`dni`;
 
+/*    Tipo Inmueble    */
 INSERT INTO `tipo_inmueble` (`nombre`) VALUES
 ('Casa'),
 ('Departamento'),
@@ -129,7 +171,7 @@ INSERT INTO `tipo_inmueble` (`nombre`) VALUES
 ('Loft')
 ON DUPLICATE KEY UPDATE `nombre` = `nombre`;
 
-          /* --- Query para evitar duplicados usando *NOT EXISTS* --- */
+/*    Inmueble  - Query para evitar duplicados usando *NOT EXISTS*  */
 INSERT INTO `inmueble`(`id_propietario`, `id_tipo_inmueble`, `direccion`, `cupo`, `latitud`,
     `longitud`, `precio_por_dia`, `porcentaje_reserva`, `disponible`)
 SELECT p.id, t.id, 'Av. España 1250', 6, -33.3017234, -66.3378901, 85000.00, 30.00, TRUE
@@ -187,8 +229,9 @@ WHERE p.dni = '22222222'
         AND i.direccion = 'Rivadavia 920'
   );
 
-/* ---- Seeders de Reservas (fechas relativas a la fecha actual) ---- */
-/* Reserva 1: vigente (hoy está dentro del rango) */
+/* ---- Reservas (fechas relativas a la fecha actual) ---- */
+
+                /* Reserva 1: vigente (hoy está dentro del rango) */
 INSERT INTO `reserva` (`id_inquilino`, `id_inmueble`, `fecha_desde`, `fecha_hasta`, `monto_por_dia`, `anulada`)
 SELECT i.id, inm.id, DATE_SUB(CURDATE(), INTERVAL 5 DAY), DATE_ADD(CURDATE(), INTERVAL 10 DAY), 85000.00, FALSE
 FROM inquilino i
@@ -201,7 +244,7 @@ WHERE i.dni = '33333333'
         AND r.fecha_desde = DATE_SUB(CURDATE(), INTERVAL 5 DAY)
   );
 
-/* Reserva 2: histórica/vencida */
+                /* Reserva 2: histórica/vencida */
 INSERT INTO `reserva` (`id_inquilino`, `id_inmueble`, `fecha_desde`, `fecha_hasta`, `monto_por_dia`, `anulada`)
 SELECT i.id, inm.id, DATE_SUB(CURDATE(), INTERVAL 60 DAY), DATE_SUB(CURDATE(), INTERVAL 30 DAY), 65000.00, FALSE
 FROM inquilino i
@@ -214,7 +257,7 @@ WHERE i.dni = '44444444'
         AND r.fecha_desde = DATE_SUB(CURDATE(), INTERVAL 60 DAY)
   );
 
-/* Reserva 3: futura */
+                /* Reserva 3: futura */
 INSERT INTO `reserva` (`id_inquilino`, `id_inmueble`, `fecha_desde`, `fecha_hasta`, `monto_por_dia`, `anulada`)
 SELECT i.id, inm.id, DATE_ADD(CURDATE(), INTERVAL 15 DAY), DATE_ADD(CURDATE(), INTERVAL 45 DAY), 68000.00, FALSE
 FROM inquilino i
@@ -227,7 +270,7 @@ WHERE i.dni = '33333333'
         AND r.fecha_desde = DATE_ADD(CURDATE(), INTERVAL 15 DAY)
   );
 
-/* Reserva 4: vigente */
+                /* Reserva 4: vigente */
 INSERT INTO `reserva` (`id_inquilino`, `id_inmueble`, `fecha_desde`, `fecha_hasta`, `monto_por_dia`, `anulada`)
 SELECT i.id, inm.id, DATE_SUB(CURDATE(), INTERVAL 2 DAY), DATE_ADD(CURDATE(), INTERVAL 20 DAY), 45000.00, FALSE
 FROM inquilino i
@@ -240,7 +283,8 @@ WHERE i.dni = '44444444'
         AND r.fecha_desde = DATE_SUB(CURDATE(), INTERVAL 2 DAY)
   );
 
-/* Reserva 5: anulada (baja lógica). El inmueble queda 'sin reservas' para los reportes */
+                /* Reserva 5: anulada (baja lógica). 
+                El inmueble queda 'sin reservas' para los reportes */
 INSERT INTO `reserva` (`id_inquilino`, `id_inmueble`, `fecha_desde`, `fecha_hasta`, `monto_por_dia`, `anulada`)
 SELECT i.id, inm.id, DATE_SUB(CURDATE(), INTERVAL 10 DAY), DATE_ADD(CURDATE(), INTERVAL 5 DAY), 55000.00, TRUE
 FROM inquilino i
@@ -255,7 +299,7 @@ WHERE i.dni = '33333333'
   );
 
 
-/* usuario admin de prueba*/
+/* usuario - admin de prueba*/
 
 INSERT INTO usuario
     (nombre, apellido, email, clave, rol, estado)
@@ -266,7 +310,7 @@ ON DUPLICATE KEY UPDATE
     rol = 'Administrador',
     estado = TRUE;
 
-/* usuario empleado de prueba */
+/* usuario - empleado de prueba */
 INSERT INTO usuario
     (nombre, apellido, email, clave, rol, estado)
 VALUES
@@ -276,3 +320,36 @@ VALUES
 ON DUPLICATE KEY UPDATE
     rol = 'Empleado',
     estado = TRUE;
+
+/*    Pago    
+
+CREATE TABLE IF NOT EXISTS pago (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_reserva INT NOT NULL,
+    concepto VARCHAR(20) NOT NULL,
+    fecha_pago DATE NOT NULL,
+    importe DECIMAL(12,2) NOT NULL,
+    anulada BOOLEAN NOT NULL DEFAULT FALSE,
+    id_usuario_creador INT NULL,
+    fecha_creacion DATETIME NULL,
+    id_usuario_anulador INT NULL,
+    fecha_anulacion DATETIME NULL,
+
+    CONSTRAINT fk_pago_reserva
+      FOREIGN KEY (id_reserva)
+      REFERENCES reserva (id),
+
+    CONSTRAINT fk_pago_usuario_creador
+      FOREIGN KEY (id_usuario_creador)
+      REFERENCES usuario (idUsuario),
+
+    CONSTRAINT fk_pago_usuario_anulador
+      FOREIGN KEY (id_usuario_anulador)
+      REFERENCES usuario (idUsuario)
+
+) ENGINE=InnoDB;
+INSERT INTO pago (id_reserva, concepto, fecha_pago, importe, anulada)
+VALUES (3, 'Seña', CURDATE(), 30000.00, FALSE);
+
+INSERT INTO pago (id_reserva, concepto, fecha_pago, importe, anulada)
+VALUES (3, 'Pago restante', CURDATE(), 70000.00, FALSE); */

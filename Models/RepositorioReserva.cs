@@ -57,7 +57,10 @@ namespace Proyecto_Inmobiliaria.Models
                                 SET anulada = 1,
                                     id_usuario_anulador = @id_usuario_anulador,
                                     fecha_anulacion = CURRENT_TIMESTAMP
-                                WHERE id = @id AND anulada = 0";
+                                WHERE id = @id 
+                                    AND anulada = 0
+                                    AND fecha_terminacion IS NULL
+                                    AND fecha_desde > CURDATE();";
 
                 using (MySqlCommand cmd = new MySqlCommand(sql, connection))
                 {
@@ -333,9 +336,12 @@ namespace Proyecto_Inmobiliaria.Models
 
             string sql = @"SELECT inm.id, inm.direccion, COUNT(r.id) AS cantidad
                         FROM inmueble inm
-                        INNER JOIN reserva r ON r.id_inmueble = inm.id AND r.anulada = 0
-                        WHERE r.fecha_desde >= DATE_SUB(CURDATE(), INTERVAL 365 DAY)
-                            AND r.fecha_desde <= CURDATE()
+                        INNER JOIN reserva r 
+                            ON r.id_inmueble = inm.id 
+                            AND r.anulada = 0
+                        WHERE r.fecha_desde <= CURDATE()
+                            AND COALESCE(r.fecha_terminacion, r.fecha_hasta)
+                                >= DATE_SUB(CURDATE(), INTERVAL 365 DAY)
                         GROUP BY inm.id, inm.direccion
                         ORDER BY cantidad DESC;";
 

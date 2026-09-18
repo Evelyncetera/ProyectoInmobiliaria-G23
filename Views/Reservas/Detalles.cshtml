@@ -3,6 +3,12 @@
 @{
     var vigente =  !Model.Anulada && !Model.FechaTerminacion.HasValue &&
                         Model.FechaDesde <= DateTime.Today && Model.FechaHasta >= DateTime.Today;
+
+    var puedeEditar =
+        !Model.Anulada &&
+        !Model.FechaTerminacion.HasValue &&
+        Model.FechaHasta.Date >= DateTime.Today;
+
 }
 
 <div class="container mt-4">
