@@ -1,0 +1,87 @@
+@model IEnumerable<Proyecto_Inmobiliaria.Models.Usuario>
+@using System.Security.Claims
+@{
+    ViewData["Title"] = "Administrar Usuarios";
+}
+
+<h1>Administrar Usuarios</h1>
+
+<a asp-action="CrearUsuario" class="btn btn-success mb-3">Crear usuario</a>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No hay usuarios registrados.</div>
+}
+else
+{
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Model)
+            {
+                var esUsuarioActual = User.FindFirstValue(ClaimTypes.NameIdentifier) == u.IdUsuario.ToString();
+                <tr>
+                    <td>@u.IdUsuario</td>
+                    <td>@u.Nombre</td>
+                    <td>@u.Apellido</td>
+                    <td>@u.Email</td>
+                    <td>@u.Rol</td>
+                    <td>
+                        @if (u.Estado == 1)
+                        {
+                            <span class="badge bg-success">Activo</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Inactivo</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="EditarUsuario" asp-route-id="@u.IdUsuario" class="btn btn-outline-primary btn-sm">Editar</a>
+
+                        @if (u.Estado == 1)
+                        {
+                            if (esUsuarioActual)
+                            {
+                                <button class="btn btn-outline-secondary btn-sm" disabled>Desactivar</button>
+                            }
+                            else
+                            {
+                                <form asp-action="CambiarEstado" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@u.IdUsuario" />
+                                    <input type="hidden" name="estado" value="0" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">Desactivar</button>
+                                </form>
+                            }
+                        }
+                        else
+                        {
+                            <form asp-action="CambiarEstado" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@u.IdUsuario" />
+                                <input type="hidden" name="estado" value="1" />
+                                <button type="submit" class="btn btn-outline-success btn-sm">Activar</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

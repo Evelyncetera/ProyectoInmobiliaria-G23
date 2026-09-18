@@ -11,5 +11,7 @@ namespace Proyecto_Inmobiliaria.Models
         int CambiarClave(int idUsuario, string claveNueva);
         int ActualizarAvatar(int idUsuario, string avatarUrl);
         int ActualizarPerfil(int idUsuario, string nombre, string apellido, string email);
+        IList<Usuario> ObtenerTodosIncluyendoInactivos();
+        int CambiarEstado(int id, int estado);
     }
 }

@@ -55,6 +55,15 @@
                                 <i class="bi bi-calendar-check"></i> Reservas
                             </a>
                         </li>
+                        @if (User.IsInRole("Administrador"))
+                        {
+                            <!-- Enlace a la Administración de Usuarios (solo Administrador) -->
+                            <li class="nav-item">
+                                <a class="nav-link text-light" asp-area="" asp-controller="Usuarios" asp-action="Administrar">
+                                    <i class="bi bi-person-gear"></i> Usuarios
+                                </a>
+                            </li>
+                        }
                     </ul>
                     @if (User.Identity?.IsAuthenticated == true)
                     {
@@ -104,5 +113,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
